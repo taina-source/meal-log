@@ -1,0 +1,177 @@
+.sheet {
+  color:var(--text);
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:26px 26px 0 0;
+  width:100%;
+  max-width:480px;
+  max-height:calc(100dvh - env(safe-area-inset-top) - 16px);
+  padding:8px 22px calc(26px + env(safe-area-inset-bottom));
+  margin:auto auto 0;
+  overscroll-behavior:contain;
+  box-shadow:0 -10px 50px #0001
+}
+.sheet::backdrop {
+  background:#0f20184d;
+  backdrop-filter:blur(3px)
+}
+.sheet-handle {
+  width:32px;
+  height:4px;
+  background:var(--line);
+  border-radius:5px;
+  margin:0 auto 6px
+}
+.sheet-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:13px
+}
+.sheet-header h2 {
+  font-size:18px
+}
+.sheet-header .icon-button {
+  background:var(--bg);
+  width:36px;
+  height:44px
+}
+.form-stack {
+  display:flex;
+  flex-direction:column;
+  gap:20px
+}
+.field {
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  min-width:0
+}
+.field>span {
+  font-size:12px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:7px
+}
+.required {
+  font-size:9px;
+  font-weight:400;
+  background:var(--soft);
+  color:var(--accent);
+  padding:3px 5px;
+  border-radius:4px
+}
+.field input {
+  width:100%;
+  min-width:0;
+  min-height:52px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--bg);
+  color:var(--text);
+  padding:13px 12px;
+  font-size:16px;
+  appearance:none
+}
+.field input::placeholder {
+  color:var(--muted);
+  opacity:.8
+}
+.input-unit {
+  position:relative;
+  min-width:0
+}
+.input-unit input {
+  padding-right:40px
+}
+.input-unit>span {
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:12px;
+  color:var(--muted);
+  pointer-events:none
+}
+.form-pfc {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px
+}
+.form-pfc .field>span {
+  font-size:10px;
+  white-space:nowrap
+}
+.form-pfc input {
+  padding-left:10px;
+  padding-right:23px
+}
+.form-pfc .input-unit>span {
+  right:10px
+}
+.two-columns {
+  display:grid;
+  grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);
+  gap:12px
+}
+.field input[type=date],.field input[type=time] {
+  display:block;
+  text-align:left;
+  padding:12px 9px;
+  font-size:16px;
+  max-width:100%
+}
+.segment-field {
+  border:0;
+  padding:0;
+  margin:0;
+  min-width:0
+}
+.segmented {
+  display:flex;
+  border-radius:12px;
+  padding:4px;
+  background:var(--bg);
+  border:1px solid var(--line);
+  gap:2px
+}
+.segmented button {
+  min-height:44px;
+  flex:1;
+  border-radius:9px;
+  font-size:12px;
+  color:var(--muted);
+  padding:5px 3px
+}
+.segmented button.selected {
+  background:var(--card);
+  color:var(--accent);
+  box-shadow:0 1px 6px #0000000d;
+  font-weight:650
+}
+.compact {
+  margin-top:-10px
+}
+.form-error {
+  background:var(--danger-bg);
+  color:var(--danger);
+  font-size:13px;
+  padding:13px 14px;
+  border-radius:12px;
+  line-height:1.7
+}
+.local-note {
+  text-align:center;
+  font-size:10px;
+  color:var(--muted);
+  margin-top:-7px
+}
+.danger {
+  background:var(--danger);
+  color:var(--card)
+}
+.danger-subtle {
+  background:var(--danger-bg);
+  color:var(--danger)
+}
