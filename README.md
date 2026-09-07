@@ -1,108 +1,207 @@
-# Meal Log — 第1段階
+# Meal Log — 第2段階
 
-iPhone 14の縦画面を優先した、個人用カロリー・PFC・体重記録PWAです。アプリの実行に有料API・バックエンド・ログインは不要です。デモデータは入れていません。
+iPhone 14向けのカロリー・PFC・体重記録PWA。React / TypeScript / Vite / Dexieを使用。追加料金0円、バックエンド・有料API・ログイン・クラウド同期なし。個人データは端末のIndexedDBだけに保存します。
 
-## 起動
+第1段階は利用者がGitHub Pages・iPhone 14実機・ホーム画面PWA・保存・オフライン動作を確認済み。今回の第2段階はコードを更新し、commit / pushは自動実行しません。
 
-Node.js 22.12以上（または24 LTS）とnpmを用意し、このフォルダーで実行します。
+## 追加した機能
+
+- 日本食品標準成分表2,538食品のオフライン検索。部分一致、全半角、英字大小、ひらがな／カタカナ、主要な日本語別名に対応。
+- 重量指定による栄養計算と登録。50 / 100 / 150 / 200 / 250g、自由入力。
+- 食事追加に最近使ったもの、食品検索、レシピ、お気に入り・履歴、セット、かんたん入力、手動入力、外食の入口。
+- レシピの作成・検索・編集・複製。材料と食数による全体・1食分計算。食事登録は1食分または全体の1/2・1/3・1/4。
+- 今回だけ材料変更、確認して元レシピを上書き、別名レシピとして保存。
+- 食品＋重量、レシピ＋割合、セットのお気に入り保存・解除・再利用。
+- 食品・レシピをまとめた「いつものセット」の作成・編集・一括登録。
+- 表示日の前日の食事を区分ごとに選び、確認してコピー。コピー済み記録は除外。
+- 名前省略可能なカロリーだけの入力。PFCは0g。
+- 外食21チェーンの店名・カテゴリー検索と案内画面。実メニュー・栄養値は未収載。
+
+第1段階のホーム、履歴・詳細・編集・削除、手入力、体重、目標・表示設定、簡易分析は維持しています。
+
+## 食品DBの出典・版
+
+**日本食品標準成分表（八訂）増補2023年から引用・加工**。文部科学省の第2章Excel「表全体」シートを使い、第三者の栄養サイトや架空値は使用していません。
+
+| 項目 | 内容 |
+| --- | --- |
+| 版 | 日本食品標準成分表（八訂）増補2023年 |
+| 公式Excel更新日 | 2026年3月27日（正誤反映版） |
+| 取得日 | 2026年9月7日 |
+| 食品数 | 2,538件。未測定を含む1食品は検索・参照のみで自動登録不可 |
+| 公式案内 | https://www.mext.go.jp/a_menu/syokuhinseibun/mext_00001.html |
+| 取得Excel | https://www.mext.go.jp/content/20260327-mxt_kagsei-mext-000029402_02.xlsx |
+| 正誤表 | https://www.mext.go.jp/content/20260327-mxt_kagsei-mext-000029402_16.xlsx |
+| 抽出列コード | kcal: ENERC_KCAL / P: PROT- / F: FAT- / C: CHOCDF- |
+| 基準 | 可食部100gあたりのkcalとg |
+
+通常の「たんぱく質」「脂質」「炭水化物」を使い、アミノ酸組成・トリアシルグリセロール当量・利用可能炭水化物とは区別しています。エネルギーは公式kcalを使い、PFCの4/9/4から再推計しません。
+
+更新済みExcelへ正誤表は二重適用しません。採用するPFC列に関する正誤2件（06372の炭水化物4.3g、10470の炭水化物12.2g）は取得ファイルで反映済みと照合しました。取得URL・版・件数・元ExcelのSHA-256は `data-sources/mext-source.json` に記録しています。
+
+### 食品データの変換
+
+Python 3.10以上と無料OSSのopenpyxlによる読み取り専用変換です。通常の起動・build・GitHub Actionsでは再取得やPythonは不要です。
+
+```sh
+python -m pip install openpyxl
+python scripts/convert-foods.py --download --retrieved-at 2026-09-07
+```
+
+再取得時は実際の取得日へ変更してください。URLは今回検証した公式版に固定しています。新しい版を採用する場合は公式サイトの版・列・特殊値・正誤を確認してスクリプトを更新します。
+
+ダウンロード済みExcelだけで再変換する場合：
+
+```sh
+python scripts/convert-foods.py --input data-sources/mext-2023-20260327.xlsx --retrieved-at 2026-09-07
+```
+
+食品番号を安定したID（例：mext-01088）にし、列コードでPFCを抽出します。別名は検索補助にだけ使い、正式食品名や栄養値を置き換えません。未知の特殊値、ID重複、想定外の少ない件数はエラーです。元ExcelはGit対象外、変換済み `public/data/mext-foods.json` と出典JSONはGitへ含めます。
+
+### 特殊値の扱い
+
+元表記は `Food.raw`、意味は `Food.status` に残します。[公式の表示記号説明](https://fooddb.mext.go.jp/help.html)に基づき、以下の規則を採用しています。
+
+| 表記 | 保存・計算 |
+| --- | --- |
+| 数値・0 | 数値のまま。公式の0には表示限界未満や検出されない値を含む |
+| (数値)・(0) | 数値と公式推定値の状態を保持。計算に利用し、注記を表示・食事へ保存 |
+| Tr・(Tr) | 数値フィールドはnull。計算時だけ0として近似し、「微量を0として近似」の注記を表示・保存 |
+| -・空欄・未測定 | null。0で補完せず、自動計算による食事登録・材料追加を停止 |
+
+PFCのTrは最小記載量0.1gの1/10以上・5/10未満（0.01g以上0.05g未満）です。0への近似は実測ゼロを意味しません。量や材料数が多いと微量分が積み重なります。推定値はAI補完ではありません。
+
+今回の4列には推定値846セル、Tr173セル、推定Tr6セル、未測定2セルがあります。未測定2セルは「わかめ カットわかめ 水煮の汁」のPとFです。
+
+## 計算とスナップショット
+
+- 食品：公式100g値 × 可食部の重量 / 100。生・ゆで・焼きなどは別食品です。
+- レシピ全体：材料ごとの100g値 × 重量 / 100 の合計。1食分は全体 / 設定食数。
+- 「全体の1/2・1/3・1/4」はレシピ全体に対する割合。「1食分」は食数の逆数です。
+- **完成後の料理重量入力、完成品100gあたりの再計算は実装していません。**
+- レシピ材料は選択時の食品の100g値・名前・版・注記を保持。食品DBを更新しても保存済み材料値は変わりません。最新値にするには食品を選び直してください。
+- 食事は登録時点のkcal/PFCをコピーして保存。元食品・レシピを変更しても過去の食事は再計算しません。レシピ食事は材料・食数もスナップショット保存します。
+- 今回だけの材料変更は元レシピへ保存せず、上書きは専用確認ボタン、別名保存・複製は新IDです。
+- 小数は計算・保存で維持し、表示だけ丸めます。合算の浮動小数誤差は小数6桁で整えます。PFC小数表示設定は新画面にも反映します。
+
+## お気に入り・最近使ったもの・セット
+
+- お気に入りは種別・参照ID・量を保存。同じ食品の100gと200gは別候補。同じ種別・ID・量は重複しません。
+- レシピのお気に入りは全体に対する割合を保存。元の食数を変更しても保存済み割合は維持します。お気に入りは現在の保存済みレシピ・セットを開きます。
+- 最近使ったものはMealEntryから導出。使用ごとに `1 / (1 + 経過日数 / 7)` を足し、同点は直近日時で並べます。専用の利用履歴テーブルはありません。
+- 最近の食品は前回重量、レシピは前回の材料と割合、セットは前回の登録グループから再構築した構成を初期値にします。セット内の複数MealEntryを使用回数として二重カウントしません。
+- セットは構成要素の量・栄養スナップショット・合計を保持。元レシピ変更で自動更新されません。必要時に構成を追加し直すか、セットの量を編集します。
+- セット登録はトランザクションで通常のMealEntry群を一括追加。一部だけの登録は起こらず、セット名と登録グループIDを参照できます。
+
+## 前日コピー・かんたん入力
+
+前日コピーは表示日の前日→表示日。区分を選んで確認し、元の栄養値・時刻・出典を新IDで複製します。`copiedFromId + copyTargetDate` をトランザクション内で確認するため、連打や同時実行でも同じ元記録を二重コピーしません。別途手動で登録した似た食事を自動判定して削除することはありません。
+
+かんたん入力はカロリー必須、名前省略時は「かんたん入力」、PFCは0、sourceTypeはmanualです。
+
+## IndexedDB v1 → v2
+
+DB名は引き続き **meal-log**。`version(1)` の定義を残し、`version(2)` を追加。Dexieによる追加スキーマ移行が初回起動時に自動で行われます。手作業によるデータ消去は不要です。
+
+| テーブル | 変更 |
+| --- | --- |
+| meals | 既存行は無変更。sourceId、setId、コピー元・対象日の複合インデックス追加 |
+| weights / settings | スキーマ・データとも維持 |
+| recipes | 新規。材料配列・食数・名前・日時 |
+| favorites | 新規。種別・参照ID・量 |
+| mealSets | 新規。構成要素・合計・日時 |
+
+材料はrecipes内へ埋め込み、食数と原子的に保存します。食品は静的JSON、店舗は静的一覧。不要な空テーブルは作りません。
+
+MealEntryへ追加したsourceId / quantity / unit / sourceVersion / notes / recipeSnapshot / setId / setName / setRunId / copiedFromId / copyTargetDateはすべてoptional。従来記録は補完や書換えなしで読めます。DBのclear・deleteによる初期化はありません。既存の食事編集でも出典等の追加フィールドを保持します。日次合計は従来どおりMealEntryから計算します。
+
+テストでは旧DBに食事・体重・設定を入れて更新し、完全一致で残ることを確認します。ブラウザーテストも専用プロファイルに旧版のネイティブIndexedDBを作成して移行し、利用者のブラウザーデータには触れません。
+
+## 外食の第3段階予定
+
+マクドナルド、KFC、モスバーガー、SUBWAY、すき家、吉野家、松屋、なか卯、丸亀製麺、はなまるうどん、CoCo壱番屋、大戸屋、ロイヤルホスト、ガスト、びっくりドンキー、ジョイフル、天下一品、餃子の王将、スシロー、くら寿司、はま寿司の21チェーンを表示します。最近使った店・お気に入り店舗の欄は案内のみです。
+
+RestaurantMenuItem / NutrientProvenanceには商品名、サイズ、栄養素ごとの値・出典、期間限定、過去公式値を持てる型を用意。今回は実メニュー・栄養値とも0件です。
+
+## 起動・テスト
+
+Node.js 24 LTSを推奨。npmの場合：
 
 ```sh
 npm install
 npm run dev
-```
-
-PCで `http://localhost:5173/meal-log/` を開きます。開発サーバーは同じWi-FiのiPhoneから `http://PCのIPアドレス:5173/meal-log/` でも確認できます。OSのファイアウォールで必要に応じてアクセスを許可してください。HTTPのLANアドレスではサービスワーカーが動作しないため、オフラインの検証には次のHTTPS手順を使います。
-
-```sh
 npm test
 npm run build
 npm run preview
 ```
 
-本番出力は `dist/`。PCの `http://localhost:4173/meal-log/` でサービスワーカーを含む本番動作を確認できます。開発モードではサービスワーカーを登録しません。
+ロックファイルで依存関係を揃える場合（GitHub Actionsも同じ構成）：
 
-この作業環境ではnpmコマンドがなかったため、同等のpnpmでインストールしています。再現用に `pnpm-lock.yaml` を同梱しています。pnpm利用時は `pnpm install --frozen-lockfile`、`pnpm test`、`pnpm run build` が使えます。`pnpm-workspace.yaml` はesbuildのインストールスクリプトのみ許可します。
-
-## iPhoneでアプリとして確認する
-
-1. [GitHub Pagesの初回公開手順](docs/GITHUB_PAGES.md)に従って、既存の公開リポジトリ `meal-log` にソースをpush。
-2. GitHub Actionsがテスト・本番ビルド・Pages公開を自動実行。`dist/` はGitへpushせず、Actionsが生成・配信します。公開はまだ実行していません。
-3. iPhoneのSafariで発行されたHTTPS URLを開く。
-4. 「オフラインで使う準備ができました」を確認。
-5. Safariの共有メニュー → 「ホーム画面に追加」。表示される場合は「Webアプリとして開く」をONにして追加。
-6. ホーム画面のアイコンから起動して食事・体重を登録し、アプリを閉じて再起動して記録が残ることを確認。
-7. 機内モードに切り替え、Wi-FiもOFFにして再起動。記録の閲覧・追加・編集を確認。
-
-静的ホスティングはアプリのHTML/JS等の配信だけに使います。食事記録や体重を送信する実装はありません。公開リポジトリ・サイトは他の人も閲覧できますが、端末の記録は公開されません。実機Safariでの終了後の永続性・セーフエリア・キーボードは、この手順で最終確認してください。
-
-参考：[Appleの追加手順](https://support.apple.com/ja-jp/guide/iphone/iphea86e5236/ios)、[Service WorkerのHTTPS要件](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)、[GitHub Pagesの無料利用条件](https://docs.github.com/en/pages/getting-started-with-github-pages)。
-
-## 実装した機能
-
-- ホーム：日付移動／今日へ戻る、残り・超過カロリー、PFC、進捗、食事4区分、体重の記録・更新。
-- 手入力：区分の初期選択、食事名・カロリー必須、PFC空欄は0、日付・時刻、数値検証。時刻から朝食4〜10時／昼食11〜15時／夕食16〜21時／その他は間食を選択。
-- 履歴：日付別、食事詳細、編集、確認付き削除。ホームの食事区分からはその日の区分に絞った記録を表示。
-- 設定：カロリー・PFC・目標体重、システム／ライト／ダーク、小数表示。目標は保存時、表示設定は選択時に反映。
-- 分析：今日の摂取・目標とPFCのみ。献立提案ボタンは追加予定の通知のみ。
-- PWA：standalone、セーフエリア、仮PNGアイコン、apple-touch-icon、オフラインキャッシュ、更新通知。更新は入力を保存してから手動で適用。
-
-## 構成
-
-```text
-src/
-  App.tsx                  画面切替・日付・モーダル・テーマ
-  main.tsx                 React起動
-  components/              ナビ、入力部品、PFC、ダイアログ、PWA通知
-  pages/                   Home / MealForm / History / MealDetail / Settings / Analysis
-  domain/
-    types.ts               MealEntry / WeightEntry / UserSettingsと拡張用の種別
-    date.ts                端末のタイムゾーンに沿った日付処理
-    nutrition.ts           合計と表示（元データを変更しない）
-    validation.ts          入力の検証
-    domain.test.ts         計算・時刻区分・境界・入力のテスト
-  data/
-    db.ts                  Dexieのスキーマ・バージョン
-    repository.ts          DBの取得／保存／削除
-    id.ts                  端末内ID生成
-    repository.test.ts     保存・再接続・更新・削除のテスト
-  styles.css               共通デザイン
-  styles/                  画面とフォームのCSS
-public/
-  favicon.svg              差し替え可能なアイコン原稿
-  icons/                   180 / 192 / 512px・maskableのPNG
-vite.config.ts             Vite、manifest、サービスワーカー生成
-.github/workflows/deploy.yml mainへのpushでテスト・ビルド・Pages公開
-docs/GITHUB_PAGES.md        初回pushとPages設定の手順
+```sh
+npm install --global pnpm@11.19.0
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run build
+pnpm run preview
 ```
 
-主要ライブラリ：React、TypeScript、Vite、Dexie、dexie-react-hooks、vite-plugin-pwa、workbox-window。テストにはVitestとfake-indexeddb。外部フォント・CDN・計測SDKは使用していません。
+開発は `http://localhost:5173/meal-log/`、本番プレビューは `http://localhost:4173/meal-log/`。開発モードのService Workerは無効なので、オフライン確認には本番プレビューを使います。自動テストは既存24件に食品・レシピ・お気に入り・セット・コピー・移行・再接続等を追加しています。
 
-## 確認結果
+ChromeとPlaywrightを別途使える環境では、プレビュー起動後にブラウザーテストも可能です。Playwrightはアプリの依存に含めていません。既存のインストールを使う場合は `PLAYWRIGHT_MODULE` にモジュールへのパスを指定します。
 
-- 依存関係インストール完了（pnpm、npm install相当）。
-- TypeScript型チェックとVite本番ビルド成功（npm run build相当）。
-- Vitest：24件すべて成功。集計・時刻区分・数値検証・日付境界・IndexedDBの保存／編集／削除／再接続を確認。
-- ChromeのiPhone 14相当サイズ（390×844）で、食事追加・編集・日付移動・削除確認とキャンセル・目標変更・テーマ・小数表示・体重を確認。
-- 専用ブラウザープロファイルを閉じて再起動し、オフラインでアプリ起動／保存済みデータ読込／食事追加／リロードに成功。
-- 320px幅でも横スクロールなし。検証中のコンソールエラー・ページエラーなし。
-- iPhone実機とSafari自体は未検証です。上の実機確認手順を実施してください。
+```sh
+node scripts/browser-check.cjs
+node scripts/browser-stage2.cjs
+```
 
-追加のブラウザーテストは `scripts/browser-check.cjs` にあります。ChromeとPlaywrightがある環境で `node scripts/browser-check.cjs` を実行します（先に `npm run preview`）。Playwrightはアプリ本体の依存に含めていません。既存のPlaywrightを使う場合は `PLAYWRIGHT_MODULE` 環境変数にそのモジュールへのパスを指定します。結果とスクリーンショットはGit対象外の `test-results/` に出力され、通常使用するブラウザーの記録には触れません。
+第1段階のテストの既定URLはlocalhost:4173、stage2の既定URLは127.0.0.1:4175（いずれも末尾は /meal-log/）。別ポートでは `APP_URL` にプレビューURLを設定してください。出力と専用プロファイルはGit対象外の `test-results/` です。
 
-GitHub Pages用のVite base・manifestの起動URL／scope／アイコン・Service Workerのscopeは `/meal-log/` に統一しています。ブラウザーテストにも、サブディレクトリ内のmanifest・アイコン取得とService Worker登録先の検証を含めています。GitHub ActionsではNode.js 24とpnpm 11.19.0を使い、既存ロックファイルを `--frozen-lockfile` で再現します。
+## 第2段階の最終確認結果
 
-Pages設定変更後も24件のテスト・型チェック・本番ビルドが成功し、`/meal-log/` 配下でのブラウザーテストも成功しています。ロックファイル固定でのインストールと、Gitによる不要ファイル除外も確認済みです。GitHub側のworkflow実行・実際の公開・実機Safariは初回push後に確認します。
+2026年9月7日、ローカルの本番ビルドを `/meal-log/` 配下で確認しました。
 
-## データと拡張方針
+| 確認 | 結果 |
+| --- | --- |
+| 固定依存のインストール | pnpm 11.19.0、frozen-lockfileで成功。追加のアプリ依存なし |
+| 全自動テスト | 69件成功（既存24件＋追加45件）、4ファイル |
+| TypeScript・本番ビルド | `pnpm run build`（`tsc -b && vite build`）成功 |
+| PWA生成 | 16ファイル、約1.6MiBを事前キャッシュ。食品JSONを含む |
+| 旧データ移行 | v1の食事・体重・設定をv2で完全一致確認。単体テストと実ブラウザー双方で成功 |
+| 第1段階の回帰確認 | 手入力、体重、設定、履歴の編集・削除、分析、再起動・保存を確認 |
+| 第2段階の操作 | 食品・重量・お気に入り、レシピ作成・今回のみ変更・編集・複製、セット、コピーと重複防止、かんたん入力、外食案内を確認 |
+| セットの異常入力 | 空欄・不正な量を検出し、修正後のリアルタイム再計算・登録を確認 |
+| 画面 | Chromeで390×844、ライト・ダーク、320px幅の主要画面で横スクロールなし |
+| オフライン | 専用ブラウザーを終了後、通信OFFで再起動。全テーブルの再読込、食品検索・登録、レシピ登録に成功 |
+| コンソール | ブラウザーテスト2本ともページエラー・コンソールエラー0件 |
 
-IndexedDB `meal-log` の `meals` / `weights` / `settings` に保存します。日次合計は保存せず食事データから導出します。食事時刻はUTCのISO文字列、日付表示・集計の境界は端末のタイムゾーンを使用します。体重は同じ日付なら更新。PFCの小数表示OFFは画面のみ丸め、保存した小数を維持します。
+第2段階のiPhone実機Safari・ホーム画面PWAの確認は利用者による公開後の確認項目です。ブラウザーテストはChromeのモバイル相当設定であり、実機検証と区別しています。結果JSONと画面画像はローカルの `test-results/` に保存します。
 
-食事名は100文字以内、1件のカロリーは0〜20,000、各PFCは0〜2,000、体重は1〜500kg、日付は1900〜2100年。目標カロリーは1以上です。これらは異常入力防止の技術上の上限です。検証規則は `domain/validation.ts` に分離しています。
+## PWA・オフライン・GitHub Pages
 
-今後の機能は `SourceType` と `MealEntry` を共通形式とし、データ取得を別モジュールとして追加できます。DBのテーブル追加・移行は `db.ts` の次バージョンで行います。第2段階のテーブルや仮データ、API実装は追加していません。
+Vite base、manifestのid・start_url・scope、Service Worker、各アイコンは `/meal-log/` を維持。食品JSON約1.22MBもService Workerで事前キャッシュします。実行時の食品取得は自分自身の静的JSONのみで外部APIを呼びません。初回の準備完了後は新旧の全記録機能をオフライン利用できます。
 
-SafariのWebサイトデータ消去、プライベートブラウズ、OSによるストレージ削除、端末変更時には記録を失う場合があります。通常モード・同じHTTPS URL・同じホーム画面アプリで使ってください。第1段階にはバックアップ・エクスポート・同期がありません。
+既存の `.github/workflows/deploy.yml` を維持し、mainへのpushで固定依存インストール → 全テスト → build → Pages公開。変換済み食品JSONはGitへ含め、元Excel・node_modules・dist・テスト結果は含めません。[初回公開手順](docs/GITHUB_PAGES.md)
 
-## 今回実装していないもの
+更新内容を利用者が確認して実行するコマンド：
 
-食品DB、外食DB、レシピ、バーコード／Open Food Facts、OCR、ChatGPT・ショートカット連携、お気に入り、グラフ、自動分析、献立提案、推定維持カロリー、CSV/JSON出入力、クラウド同期、アカウント、バックエンド。
+```sh
+git status --short
+git add .
+git commit -m "Add stage 2 food database recipes and meal tools"
+git push origin main
+```
+
+iPhoneではオンラインで既存PWAを起動し、入力を保存して更新通知の「更新」を選びます。旧記録・体重・設定の保持、食品検索・レシピ・セット・コピーを確認し、最後に機内モード（Wi-FiもOFF）で再起動・登録してください。SafariのWebサイトデータ消去やPWA削除による更新は不要です。
+
+## 主要ファイル
+
+- `src/pages/add/`：追加方法、食品、レシピ編集・一覧、セット、お気に入り、かんたん入力、外食。
+- `src/pages/CopyMeals.tsx`：前日コピー。
+- `src/domain/catalog.ts` / `foods.ts` / `recents.ts`：型、計算・検索、最近使用の導出。
+- `src/data/db.ts` / `catalogRepository.ts` / `copyMeals.ts` / `foods.ts`：非破壊移行・保存・静的読込。
+- `src/components/CatalogParts.tsx` / `src/styles/catalog.css`：共通UI。
+- `public/data/mext-foods.json` / `scripts/convert-foods.py` / `data-sources/mext-source.json`：食品・変換・出典。
+
+## 今回未実装
+
+21チェーンの実メニュー栄養DB、バーコード／Open Food Facts、OCR、ChatGPT取り込み、iPhoneショートカット本番連携、本格的なグラフ、自動分析、体重と摂取の関連分析、推定維持カロリー、献立提案、CSV/JSON出入力、クラウド同期、アカウント、バックエンド。料理完成後の重量入力も実装していません。

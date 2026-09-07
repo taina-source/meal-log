@@ -4,7 +4,7 @@ import { localDate, localTime } from '../domain/date';
 import { validLocalDateTime, validateMeal } from '../domain/validation';
 import { saveMeal, storageError } from '../data/repository';
 import { NumberField, FormError } from '../components/Fields';
-export function MealForm({ date, initialType, entry, onSaved }: { date: string; initialType: MealType; entry?: MealEntry; onSaved: (date: string) => void }) {
+export function MealForm({ date, initialType, initialTime, entry, onSaved }: { date: string; initialType: MealType; initialTime?: string; entry?: MealEntry; onSaved: (date: string) => void }) {
   const [mealType, setMealType] = useState(entry?.mealType ?? initialType);
   const [name, setName] = useState(entry?.name ?? '');
   const [calories, setCalories] = useState(entry?.calories.toString() ?? '');
@@ -12,7 +12,7 @@ export function MealForm({ date, initialType, entry, onSaved }: { date: string; 
   const [fat, setFat] = useState(entry?.fat.toString() ?? '');
   const [carbs, setCarbs] = useState(entry?.carbs.toString() ?? '');
   const [eatenDate, setEatenDate] = useState(entry ? localDate(new Date(entry.eatenAt)) : date);
-  const [time, setTime] = useState(entry ? localTime(new Date(entry.eatenAt)) : localTime());
+  const [time, setTime] = useState(entry ? localTime(new Date(entry.eatenAt)) : initialTime ?? localTime());
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   async function submit(event: FormEvent) {

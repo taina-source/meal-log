@@ -1,0 +1,66 @@
+// Uses a dedicated profile and synthetic legacy records, never the user's browser data.
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const out = path.resolve('test-results');
+fs.mkdirSync(out, { recursive: true });
+const profile = fs.mkdtempSync(path.join(out, 'stage2-profile-'));
+const base = process.env.APP_URL || 'http://127.0.0.1:4175/meal-log/';
+const options = { channel: 'chrome', headless: true, viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'ja-JP', timezoneId: 'Asia/Tokyo' };
+let context, page;
+const errors = [], checks = [];
+const monitor = () => { page.on('pageerror', e => errors.push(e.message)); page.on('console', e => { if(e.type() === 'error') errors.push(`${e.text()} ${e.location().url}`); }); };
+const store = name => page.evaluate(name => new Promise((resolve, reject) => { const req=indexedDB.open('meal-log'); req.onerror=()=>reject(req.error); req.onsuccess=()=>{ const db=req.result; const read=db.transaction(name).objectStore(name).getAll(); read.onsuccess=()=>{resolve(read.result);db.close();}; read.onerror=()=>reject(read.error); }; }),name);
+async function count(name, expected) { await page.waitForFunction(async ({name,expected}) => await new Promise(resolve=>{const request=indexedDB.open('meal-log');request.onsuccess=()=>{const db=request.result;const q=db.transaction(name).objectStore(name).count();q.onsuccess=()=>{resolve(q.result===expected);db.close();};};}),{name,expected}); }
+async function add() { await page.locator('nav').getByRole('button',{name:'食事を追加',exact:true}).click(); }
+async function method(name) { await page.getByRole('button',{name:new RegExp('^'+name)}).click(); }
+async function chooseFood(query, grams, action) {
+  await page.getByRole('searchbox',{name:'食品を検索',exact:true}).fill(query);
+  await page.locator('.catalog-row').first().click();
+  await page.getByRole('spinbutton',{name:/自由入力/}).fill(String(grams));
+  if(action) await page.getByRole('button',{name:action,exact:true}).click();
+}
+async function openRecipe(name) { await add(); await method('レシピ'); await page.locator('.catalog-row').filter({hasText:name}).first().click(); }
+async function close() { await page.getByRole('button',{name:'閉じる',exact:true}).click(); }
+async function noOverflow(label) {
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,label);
+  if(await page.locator('dialog').count()) assert.equal(await page.locator('dialog').evaluate(d=>d.scrollWidth<=d.clientWidth),true,label+' dialog');
+}
+async function run() {
+  context=await chromium.launchPersistentContext(profile,options);page=context.pages()[0];monitor();
+  await page.route(base, route => route.fulfill({ contentType:'text/html', body:`<!doctype html><html><head><link rel="icon" href="${new URL('favicon.svg',base).href}"></head><body>Migration seed</body></html>` }));
+  await page.goto(base);
+  const legacy=await page.evaluate(async()=>{
+    const d=new Date();const date=x=>`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;const today=date(d);d.setDate(d.getDate()-1);const yesterday=date(d);const now=new Date().toISOString();
+    const meal={id:'legacy-meal',name:'移行前の食事',restaurant:'',calories:420,protein:20.2,fat:12.3,carbs:50.4,mealType:'breakfast',eatenAt:new Date(`${today}T08:00:00`).toISOString(),createdAt:now,updatedAt:now,sourceType:'manual',confidence:null};
+    const weight={id:'legacy-weight',date:today,weight:102.8,createdAt:now};const settings={id:'user',calorieTarget:2300,proteinTarget:180,fatTarget:70,carbsTarget:260,targetWeight:90,theme:'dark',showPfcDecimals:true};
+    await new Promise((resolve,reject)=>{const request=indexedDB.open('meal-log',10);request.onupgradeneeded=()=>{const db=request.result;const meals=db.createObjectStore('meals',{keyPath:'id'});for(const key of ['eatenAt','mealType','sourceType'])meals.createIndex(key,key);const weights=db.createObjectStore('weights',{keyPath:'id'});weights.createIndex('date','date',{unique:true});db.createObjectStore('settings',{keyPath:'id'});};request.onerror=()=>reject(request.error);request.onsuccess=()=>{const db=request.result;const tx=db.transaction(['meals','weights','settings'],'readwrite');tx.objectStore('meals').add(meal);tx.objectStore('meals').add({...meal,id:'legacy-yesterday',name:'前日の食事',calories:300,eatenAt:new Date(`${yesterday}T08:00:00`).toISOString()});tx.objectStore('weights').add(weight);tx.objectStore('settings').add(settings);tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};});return {meal,weight,settings};
+  });
+  await page.unroute(base);
+  await page.goto(base);await page.waitForFunction(()=>document.querySelector('.calorie-hero strong')?.textContent==='1,880');
+  assert.deepEqual((await store('meals')).find(m=>m.id===legacy.meal.id),legacy.meal);assert.deepEqual((await store('weights'))[0],legacy.weight);assert.deepEqual((await store('settings'))[0],legacy.settings);checks.push('real IndexedDB v1→v2 retains all legacy fields');
+  await page.evaluate(async()=>{await navigator.serviceWorker.ready;});
+  if(await page.locator('.pwa-notice').isVisible()) await page.locator('.pwa-notice').getByRole('button',{name:'閉じる'}).click();
+  const cached=await page.evaluate(async()=>{for(const name of await caches.keys()){const cache=await caches.open(name);for(const request of await cache.keys())if(request.url.includes('/meal-log/data/mext-foods.json'))return true;}return false;});assert.equal(cached,true);checks.push('food JSON precached under /meal-log/');
+  await add();await noOverflow('hub');await page.screenshot({path:path.join(out,'stage2-hub-dark.png'),fullPage:true});await method('食品を検索');await chooseFood('白ごはん',200);
+  assert.match(await page.getByRole('region',{name:'今回',exact:true}).textContent(),/312/);await page.getByRole('button',{name:'☆ この量でお気に入り'}).click();await count('favorites',1);await page.getByRole('button',{name:'食事に登録',exact:true}).click();await count('meals',3);checks.push('alias search, gram calculation, food favorite and registration');
+  await add();await method('レシピ');await page.getByRole('button',{name:'＋ 新しいレシピを作る'}).click();await page.getByRole('textbox',{name:'レシピ名',exact:true}).fill('テストご飯と卵');
+  await page.getByRole('button',{name:'＋ 食品DBから材料を追加'}).click();await chooseFood('ご飯',100,'材料に追加');await page.getByRole('button',{name:'＋ 食品DBから材料を追加'}).click();await chooseFood('鶏卵 全卵 生',100,'材料に追加');await page.getByRole('button',{name:'2食分',exact:true}).click();
+  await noOverflow('recipe editor');await page.screenshot({path:path.join(out,'stage2-recipe-editor.png'),fullPage:true});await page.getByRole('button',{name:'レシピを保存',exact:true}).click();await count('recipes',1);await page.getByRole('button',{name:'☆ この量でお気に入り'}).click();await count('favorites',2);await page.getByRole('button',{name:'この量で食事に登録'}).click();await count('meals',4);
+  const recipeMeal=(await store('meals')).find(m=>m.sourceType==='recipe');assert.equal(recipeMeal.calories,149);checks.push('recipe ingredients, servings, favorite, registration');
+  await openRecipe('テストご飯と卵');await page.getByRole('button',{name:'今回だけ材料を変更',exact:true}).click();await page.getByRole('button',{name:'材料2を削除'}).click();await page.getByRole('spinbutton',{name:'材料1の重量',exact:false}).fill('200');await page.getByRole('button',{name:'今回だけ変更して登録へ'}).click();await page.getByRole('button',{name:'この量で食事に登録'}).click();await count('meals',5);assert.equal((await store('recipes'))[0].ingredients.length,2);checks.push('one-off recipe change preserves original');
+  await openRecipe('テストご飯と卵');await page.getByRole('button',{name:'複製して作る'}).click();await page.getByRole('textbox',{name:'レシピ名',exact:true}).fill('テスト複製');await page.getByRole('button',{name:'レシピを保存',exact:true}).click();await count('recipes',2);await close();
+  await openRecipe('テストご飯と卵');await page.getByRole('button',{name:'レシピを編集',exact:true}).click();await page.getByRole('spinbutton',{name:'材料1の重量',exact:false}).fill('300');await page.getByRole('button',{name:'レシピの変更を保存'}).click();await close();assert.equal((await store('meals')).find(m=>m.id===recipeMeal.id).calories,149);checks.push('recipe duplicate and edit keep past meal unchanged');
+  await add();await method('いつものセット');await page.getByRole('button',{name:'＋ 新しいセットを作る'}).click();await page.getByRole('textbox',{name:'セット名'}).fill('テスト朝食セット');await page.getByRole('button',{name:'＋ 食品',exact:true}).click();await chooseFood('ご飯',100,'セットに追加');await page.getByRole('button',{name:'＋ レシピ',exact:true}).click();await page.locator('.catalog-row').filter({hasText:'テスト複製'}).first().click();await page.getByRole('button',{name:'セットに追加',exact:true}).click();await page.getByRole('spinbutton',{name:'構成1の重量',exact:false}).fill('');assert.equal(await page.getByRole('button',{name:'＋ 食品',exact:true}).isDisabled(),true);await page.getByRole('alert').filter({hasText:'各構成の量'}).waitFor();await page.getByRole('spinbutton',{name:'構成1の重量',exact:false}).fill('150');assert.match(await page.getByRole('region',{name:'セット合計',exact:true}).textContent(),/383/);await page.getByRole('button',{name:'セットを保存',exact:true}).click();await count('mealSets',1);await page.getByRole('button',{name:'☆ この量でお気に入り'}).click();await count('favorites',3);await page.getByRole('button',{name:'このセットをまとめて登録'}).click();await count('meals',7);checks.push('food+recipe set and atomic component registration');
+  await add();await method('お気に入り・履歴');await page.getByRole('button',{name:'食品',exact:true}).click();await page.locator('.favorite-row .catalog-row').first().click();assert.equal(await page.getByRole('spinbutton',{name:/自由入力/}).inputValue(),'200');await page.getByRole('button',{name:'食事に登録',exact:true}).click();await count('meals',8);checks.push('favorite reuses saved grams');
+  await page.getByRole('button',{name:'昨日の食事をコピー',exact:true}).click();await page.getByRole('button',{name:'選択した食事を表示日にコピー'}).click();await page.getByRole('button',{name:'確認して表示日にコピー'}).click();await count('meals',9);await page.getByRole('button',{name:'昨日の食事をコピー',exact:true}).click();await page.getByRole('button',{name:'選択した食事を表示日にコピー'}).click();assert.equal(await page.getByRole('button',{name:'確認して表示日にコピー'}).isDisabled(),true);await close();checks.push('previous-day copy confirmation and duplicate prevention');
+  await add();await method('かんたん入力');await page.getByRole('spinbutton',{name:/カロリー/}).fill('850');await page.getByRole('button',{name:'カロリーを記録'}).click();await count('meals',10);assert.equal((await store('meals')).find(m=>m.name==='かんたん入力').protein,0);
+  await add();await method('外食');await page.getByRole('searchbox').fill('ｋｆｃ');await page.locator('.catalog-row').click();await page.getByText('メニューデータは第3段階で追加予定です。',{exact:true}).waitFor();await close();checks.push('quick calories and restaurant placeholder without menu data');
+  await page.locator('nav').getByRole('button',{name:'設定',exact:true}).click();await page.getByRole('button',{name:'ライト',exact:true}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='light');await page.locator('nav').getByRole('button',{name:'ホーム',exact:true}).click();await page.screenshot({path:path.join(out,'stage2-home-light.png'),fullPage:true});
+  await page.setViewportSize({width:320,height:740});await noOverflow('home 320');await add();await noOverflow('hub 320');await method('食品を検索');await chooseFood('ご飯',100);await noOverflow('food weight 320');await close();await openRecipe('テストご飯と卵');await noOverflow('recipe detail 320');await page.getByRole('button',{name:'レシピを編集',exact:true}).click();await noOverflow('recipe editor 320');await close();checks.push('light/dark and 390px/320px layout');
+  await context.close();context=await chromium.launchPersistentContext(profile,options);await context.setOffline(true);page=context.pages()[0];monitor();await page.goto(base);await page.getByRole('button',{name:'記録',exact:true}).waitFor();assert.equal((await store('meals')).length,10);assert.equal((await store('recipes')).length,2);assert.equal((await store('favorites')).length,3);assert.equal((await store('mealSets')).length,1);assert.deepEqual((await store('meals')).find(m=>m.id===legacy.meal.id),legacy.meal);
+  await add();await method('食品を検索');await chooseFood('鶏胸肉',150,'食事に登録');await count('meals',11);await page.reload();await page.getByRole('button',{name:'記録',exact:true}).waitFor();await openRecipe('テスト複製');await page.getByRole('button',{name:'全体の1/3',exact:true}).click();await page.getByRole('button',{name:'この量で食事に登録'}).click();await count('meals',12);checks.push('offline cold restart, all stores, food search/save, recipe save');
+  assert.deepEqual(errors,[]);checks.push('zero console/page errors');fs.writeFileSync(path.join(out,'stage2-browser-report.json'),JSON.stringify({result:'PASS',checks,physicalSafariTested:false},null,2));console.log(JSON.stringify({result:'PASS',checks},null,2));
+}
+run().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{if(context)await context.close();});

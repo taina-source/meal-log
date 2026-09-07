@@ -22,7 +22,7 @@ export async function saveMeal(input: MealInput, existingId?: string): Promise<M
     const existing = existingId ? await db.meals.get(existingId) : undefined;
     if (existingId && !existing) throw new Error('この食事はすでに削除されています。');
     const now = new Date().toISOString();
-    const entry: MealEntry = { ...input, name: input.name.trim(), eatenAt: new Date(input.eatenAt).toISOString(), id: existing?.id ?? createId(), restaurant: existing?.restaurant ?? '', sourceType: existing?.sourceType ?? 'manual', confidence: existing?.confidence ?? null, createdAt: existing?.createdAt ?? now, updatedAt: now };
+    const entry: MealEntry = { ...existing, ...input, name: input.name.trim(), eatenAt: new Date(input.eatenAt).toISOString(), id: existing?.id ?? createId(), restaurant: existing?.restaurant ?? '', sourceType: existing?.sourceType ?? 'manual', confidence: existing?.confidence ?? null, createdAt: existing?.createdAt ?? now, updatedAt: now };
     await db.meals.put(entry);
     return entry;
   });

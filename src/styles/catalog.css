@@ -1,0 +1,54 @@
+.add-flow { min-width: 0; }
+.back-button { min-height: 44px; text-align: left; color: var(--accent); font-size: 13px; padding: 8px 0; }
+.method-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.method-grid button { display: flex; flex-direction: column; gap: 8px; min-height: 86px; padding: 16px 12px; border: 1px solid var(--line); border-radius: 15px; background: var(--bg); text-align: left; }
+.method-grid strong { font-size: 14px; }
+.method-grid span { font-size: 11px; line-height: 1.6; color: var(--muted); }
+.method-grid button:disabled { opacity: .65; }
+.catalog-list { display: flex; flex-direction: column; min-width: 0; }
+.catalog-row { display: flex; flex-direction: column; gap: 8px; width: 100%; min-width: 0; padding: 15px 10px; text-align: left; border-bottom: 1px solid var(--line); min-height: 64px; }
+.catalog-row strong, .wrapping-name, .ingredient-card strong { overflow-wrap: anywhere; line-height: 1.65; }
+.catalog-row strong { font-size: 14px; font-weight: 600; }
+.catalog-row > span { font-size: 12px; color: var(--muted); }
+.food-values { background: var(--bg); border-radius: 12px; padding: 14px; line-height: 1.8; }
+.food-values > span { color: var(--muted); font-size: 12px; }
+.food-values p { font-weight: 650; }
+.compact-values { padding: 0; background: none; }
+.compact-values p { font-size: 13px; }
+.choice-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice-grid button { min-height: 44px; min-width: 52px; padding: 10px 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; font-size: 13px; }
+.choice-grid button[aria-pressed=true] { background: var(--soft); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.recipe-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.nutrient-summary { padding: 17px; background: var(--soft); border-radius: 16px; }
+.nutrient-summary h3 { font-size: 13px; line-height: 1.7; font-weight: 500; }
+.nutrient-summary p { margin: 10px 0; color: var(--accent); font-size: 13px; }
+.nutrient-summary strong { font-size: 30px; }
+.nutrient-summary > div { font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.catalog-note { background: var(--soft); border-left: 3px solid var(--accent); padding: 12px; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.source-caption { font-size: 11px; color: var(--muted); line-height: 1.8; }
+.action-wrap { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.action-wrap > button { width: 100%; }
+.ingredient-card { display: flex; flex-direction: column; gap: 14px; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.ingredient-card > strong { font-size: 13px; }
+.ingredient-controls { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 10px; }
+.catalog-details { border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; min-width: 0; }
+.catalog-details summary { padding: 14px 0; min-height: 44px; font-size: 12px; cursor: pointer; line-height: 1.7; overflow-wrap: anywhere; }
+.catalog-details p { font-size: 12px; line-height: 1.8; padding: 10px 0; }
+.catalog-details > div { padding-bottom: 12px; }
+.favorite-row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 8px; }
+.home-shortcuts { display: flex; gap: 10px; margin-top: 8px; }
+.home-shortcuts button { flex: 1; min-height: 44px; font-size: 11px; color: var(--accent); padding: 8px 2px; }
+.copy-choice { display: flex; align-items: center; gap: 14px; padding: 16px 8px; border-bottom: 1px solid var(--line); font-size: 14px; min-height: 64px; }
+.copy-choice input { width: 23px; height: 23px; accent-color: var(--accent); }
+.copy-choice > span { display: flex; flex: 1; flex-direction: column; gap: 6px; }
+.copy-choice small { font-size: 11px; color: var(--muted); }
+.copy-choice b { font-size: 13px; }
+.form-stack h3 { overflow-wrap: anywhere; }
+@media (max-width: 359px) {
+  .sheet { padding-left: 15px; padding-right: 15px; }
+  .method-grid strong { font-size: 12px; }
+  .method-grid button { padding: 14px 10px; }
+  .nutrient-summary > div { font-size: 11px; }
+  .home-shortcuts { gap: 5px; }
+  .home-shortcuts button { font-size: 10px; }
+}

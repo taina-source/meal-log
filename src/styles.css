@@ -1,5 +1,6 @@
 @import './styles/forms.css';
 @import './styles/pages.css';
+@import './styles/catalog.css';
 :root {
   font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
   color:#24392e;

@@ -1,0 +1,22 @@
+{
+  "name": "日本食品標準成分表（八訂）増補2023年",
+  "version": "日本食品標準成分表（八訂）増補2023年・2026年3月27日更新",
+  "sourceUrl": "https://www.mext.go.jp/content/20260327-mxt_kagsei-mext-000029402_02.xlsx",
+  "sourcePage": "https://www.mext.go.jp/a_menu/syokuhinseibun/mext_00001.html",
+  "retrievedAt": "2026-09-07",
+  "sha256": "0d5a77077dd6cd91cbc2e6e317b8b218a38728c409eed452f1c10635a0d3099c",
+  "foodCount": 2538,
+  "specialValueCounts": {
+    "estimated": 846,
+    "trace": 173,
+    "missing": 2,
+    "estimated-trace": 6
+  },
+  "columns": {
+    "calories": "ENERC_KCAL",
+    "protein": "PROT-",
+    "fat": "FAT-",
+    "carbs": "CHOCDF-"
+  },
+  "workbookUpdatedAt": "2026-03-27"
+}

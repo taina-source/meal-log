@@ -50,6 +50,7 @@ async function run() {
 
   await page.getByRole('button', { name: '昼食を追加', exact: true }).click();
   assert.equal(await page.getByRole('button', { name: '昼食', exact: true }).getAttribute('aria-pressed'), 'true');
+  await page.getByRole('button', { name: /^手動入力/ }).click();
   await page.getByRole('button', { name: '食事を保存', exact: true }).click();
   await page.getByRole('alert').filter({ hasText: 'カロリーを入力してください' }).waitFor();
   await page.getByLabel('食事名', { exact: false }).fill('鶏むね肉とご飯');
@@ -126,6 +127,7 @@ async function run() {
   await page.waitForFunction(() => document.querySelector('.calorie-hero strong')?.textContent === '2,300');
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
   await page.getByRole('button', { name: '朝食を追加', exact: true }).click();
+  await page.getByRole('button', { name: /^手動入力/ }).click();
   await page.getByLabel('食事名', { exact: false }).fill('オフラインで登録');
   await page.getByRole('spinbutton', { name: /カロリー/ }).fill('100');
   await page.getByRole('button', { name: '食事を保存', exact: true }).click();

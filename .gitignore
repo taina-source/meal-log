@@ -14,3 +14,5 @@ coverage/
 !.env.example
 .codex/
 .agents/
+data-sources/*.xlsx
+__pycache__/

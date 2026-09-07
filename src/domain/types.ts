@@ -12,6 +12,17 @@ export interface MealEntry extends Nutrients {
   updatedAt: string;
   sourceType: SourceType;
   confidence: number | null;
+  sourceId?: string;
+  sourceVersion?: string;
+  quantity?: number;
+  unit?: 'g' | 'whole';
+  notes?: string[];
+  recipeSnapshot?: import('./catalog').Recipe;
+  setId?: string;
+  setName?: string;
+  setRunId?: string;
+  copiedFromId?: string;
+  copyTargetDate?: string;
 }
 export interface UserSettings {
   calorieTarget: number;
