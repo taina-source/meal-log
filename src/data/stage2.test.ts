@@ -32,7 +32,7 @@ describe('前日の食事コピー', () => {
   it('二重実行が重なっても同じ元記録を重複コピーしない', async () => { await registerItems([foodItem(rice,200,'1')],context); const results = await Promise.all([copyPreviousDay('2026-09-07',['lunch']),copyPreviousDay('2026-09-07',['lunch'])]); expect(results.reduce((sum,result)=>sum+result.copied,0)).toBe(1); expect(results.reduce((sum,result)=>sum+result.skipped,0)).toBe(1); expect(await getDayMeals('2026-09-07')).toHaveLength(1); });
   it('コピー対象がない場合は0件', async () => expect(await copyPreviousDay('2026-09-07',['dinner'])).toEqual({copied:0,skipped:0}));
 });
-describe('v1からv2への非破壊移行', () => {
+describe('v1から現行バージョンへの非破壊移行', () => {
   it('既存の食事・体重・設定を完全一致で保持する', async () => {
     const name = `migration-${crypto.randomUUID()}`;
     const old = new Dexie(name);
@@ -42,6 +42,6 @@ describe('v1からv2への非破壊移行', () => {
     const settings = {...defaultSettings,id:'user',theme:'dark',calorieTarget:2300,showPfcDecimals:false};
     await old.table('meals').add(legacy); await old.table('weights').add(weight); await old.table('settings').add(settings); old.close();
     const next = new MealLogDatabase(name);
-    try { await next.open(); expect(next.verno).toBe(2); expect(await next.meals.get(legacy.id)).toEqual(legacy); expect(await next.weights.get(weight.id)).toEqual(weight); expect(await next.settings.get('user')).toEqual(settings); expect(await next.recipes.count()).toBe(0); expect(await next.favorites.count()).toBe(0); expect(await next.mealSets.count()).toBe(0); next.close(); await next.open(); expect(await next.meals.get(legacy.id)).toEqual(legacy); } finally { next.close(); }
+    try { await next.open(); expect(next.verno).toBe(3); expect(await next.meals.get(legacy.id)).toEqual(legacy); expect(await next.weights.get(weight.id)).toEqual(weight); expect(await next.settings.get('user')).toEqual(settings); expect(await next.recipes.count()).toBe(0); expect(await next.favorites.count()).toBe(0); expect(await next.mealSets.count()).toBe(0); next.close(); await next.open(); expect(await next.meals.get(legacy.id)).toEqual(legacy); } finally { next.close(); }
   });
 });

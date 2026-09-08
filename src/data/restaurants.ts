@@ -7,4 +7,4 @@ const groups: [Restaurant['category'], string[]][] = [
   ['回転寿司', ['スシロー', 'くら寿司', 'はま寿司']],
   ['定食・ファミレス', ['大戸屋', 'ロイヤルホスト', 'ガスト', 'びっくりドンキー', 'ジョイフル']],
 ];
-export const restaurants: Restaurant[] = groups.flatMap(([category, names]) => names.map(name => ({ id: `restaurant:${name}`, name, category, aliases: name === 'KFC' ? ['ケンタッキー'] : name === 'SUBWAY' ? ['サブウェイ'] : name === 'CoCo壱番屋' ? ['ココイチ', 'ココ壱'] : [] })));
+export const restaurants: Restaurant[] = groups.flatMap(([category, names]) => names.map(name => ({ id: `restaurant:${name}`, name, category, aliases: name === 'マクドナルド' ? ['マック', 'マクド', 'McDonalds'] : name === 'KFC' ? ['ケンタッキー', 'ケンタ'] : name === 'SUBWAY' ? ['サブウェイ'] : name === 'CoCo壱番屋' ? ['ココイチ', 'ココ壱'] : [] })));

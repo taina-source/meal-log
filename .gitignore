@@ -16,3 +16,4 @@ coverage/
 .agents/
 data-sources/*.xlsx
 __pycache__/
+data-sources/restaurants/raw/

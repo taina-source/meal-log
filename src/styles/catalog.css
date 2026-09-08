@@ -52,3 +52,23 @@
   .home-shortcuts { gap: 5px; }
   .home-shortcuts button { font-size: 10px; }
 }
+
+/* Stage 3 restaurant screens: one scroll surface, safe-area-aware cart. */
+.restaurant-flow { min-width: 0; }
+.store-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.menu-row { display: flex; align-items: center; min-width: 0; border-bottom: 1px solid var(--line); }
+.menu-row .catalog-row { flex: 1; border-bottom: 0; }
+.menu-add { flex: 0 0 44px; width: 44px; height: 44px; background: var(--soft); color: var(--accent); border-radius: 50%; font-size: 24px; }
+.menu-nutrition { display: flex; flex-direction: column; gap: 7px; font-size: 13px; line-height: 1.6; }
+.menu-nutrition > strong { font-size: 19px; }
+.provenance-row { display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--line); padding: 12px 0; overflow-wrap: anywhere; font-size: 13px; line-height: 1.7; }
+.provenance-row a { color: var(--accent); padding: 6px 0; }
+.provenance-row small { color: var(--muted); }
+.quantity-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.quantity-controls button { min-width: 44px; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+.quantity-controls output { min-width: 24px; text-align: center; }
+.cart-line { padding: 16px 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; overflow-wrap: anywhere; }
+.restaurant-cart-bar { position: sticky; bottom: 0; z-index: 3; display: flex; gap: 10px; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 10px calc(12px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 16px #0001; }
+.restaurant-cart-bar > div { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.restaurant-cart-bar .button { padding: 12px; font-size: 13px; flex-shrink: 0; }
+.restaurant-order-heading { background: var(--soft); padding: 12px 16px; font-size: 13px; line-height: 1.6; }

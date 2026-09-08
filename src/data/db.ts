@@ -16,6 +16,8 @@ export class MealLogDatabase extends Dexie {
       meals: 'id, eatenAt, mealType, sourceType, sourceId, setId, [copiedFromId+copyTargetDate]',
       recipes: 'id, name, updatedAt', favorites: 'id, kind, sourceId', mealSets: 'id, name, updatedAt',
     });
+    // Indexes only. No row rewrite, clearing, or deletion in any migration.
+    this.version(3).stores({ meals: 'id, eatenAt, mealType, sourceType, sourceId, setId, [copiedFromId+copyTargetDate], restaurantId, restaurantOrderId' });
   }
 }
 export const db = new MealLogDatabase();

@@ -23,6 +23,11 @@ export async function saveMeal(input: MealInput, existingId?: string): Promise<M
     if (existingId && !existing) throw new Error('この食事はすでに削除されています。');
     const now = new Date().toISOString();
     const entry: MealEntry = { ...existing, ...input, name: input.name.trim(), eatenAt: new Date(input.eatenAt).toISOString(), id: existing?.id ?? createId(), restaurant: existing?.restaurant ?? '', sourceType: existing?.sourceType ?? 'manual', confidence: existing?.confidence ?? null, createdAt: existing?.createdAt ?? now, updatedAt: now };
+    if (existing?.restaurantSnapshot && (['calories', 'protein', 'fat', 'carbs'] as const).some(key => existing[key] !== input[key])) {
+      entry.sourceType = 'manual'; entry.manuallyEditedNutrition = true;
+      // The immutable source snapshot remains available, but no longer describes the edited totals.
+      entry.nutrientProvenance = undefined;
+    }
     await db.meals.put(entry);
     return entry;
   });

@@ -1,6 +1,6 @@
 export const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 export type MealType = typeof mealTypes[number];
-export type SourceType = 'manual' | 'official' | 'official_old' | 'database' | 'estimate' | 'ai_estimate' | 'barcode' | 'recipe';
+export type SourceType = 'manual' | 'official' | 'official_old' | 'secondary' | 'database' | 'estimate' | 'ai_estimate' | 'barcode' | 'recipe';
 export interface Nutrients { calories: number; protein: number; fat: number; carbs: number }
 export interface MealEntry extends Nutrients {
   id: string;
@@ -15,7 +15,13 @@ export interface MealEntry extends Nutrients {
   sourceId?: string;
   sourceVersion?: string;
   quantity?: number;
-  unit?: 'g' | 'whole';
+  unit?: 'g' | 'whole' | 'item';
+  restaurantId?: string;
+  restaurantName?: string;
+  restaurantOrderId?: string;
+  restaurantSnapshot?: import('./catalog').RestaurantMenuItem;
+  nutrientProvenance?: Record<keyof Nutrients, import('./catalog').NutrientProvenance>;
+  manuallyEditedNutrition?: boolean;
   notes?: string[];
   recipeSnapshot?: import('./catalog').Recipe;
   setId?: string;

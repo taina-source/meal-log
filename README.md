@@ -1,10 +1,87 @@
-# Meal Log — 第2段階
+# Meal Log — 第3A-1段階
 
 iPhone 14向けのカロリー・PFC・体重記録PWA。React / TypeScript / Vite / Dexieを使用。追加料金0円、バックエンド・有料API・ログイン・クラウド同期なし。個人データは端末のIndexedDBだけに保存します。
 
-第1段階は利用者がGitHub Pages・iPhone 14実機・ホーム画面PWA・保存・オフライン動作を確認済み。今回の第2段階はコードを更新し、commit / pushは自動実行しません。
+第1・第2段階は利用者がGitHub Pages・iPhone 14実機・PWA更新・IndexedDB v1→v2移行・オフライン動作を確認済み。第3A-1では7チェーンの公式外食DBを追加します。commit / pushは自動実行しません。
 
-## 追加した機能
+## 第3A-1で追加した機能
+
+- 店名・商品名・別名・サイズの横断検索。全半角、英字大小、ひらがな／カタカナを吸収。
+- 店舗別検索・カテゴリー、商品からサイズ／地域／温冷を選択、栄養素別の出典表示。
+- 商品を「今回の食事」へ追加。数量1〜99、削除、合計kcal/PFC、食事区分・日時を指定して一括保存。
+- 店舗・外食商品のお気に入り保存／解除。外食トップと既存のお気に入り画面から再利用。
+- 最近使った店はMealEntryから日時と頻度で導出。同じ注文の商品数で回数を水増ししません。
+- 商品ごとのMealEntryと共通restaurantOrderIdを保存し、履歴に同じ外食の合計を表示。
+- 栄養値・商品名・サイズ・出典・版をスナップショット保存。前日コピーでも保存値を維持し、注文IDだけ新しくします。
+
+## 外食DBの出典・収録範囲
+
+取得日 **2026年9月8日**。すべて実際に取得・確認した公式HTML／PDF／商品ページの値です。検索スニペット、第三者サイト、AIの推定値は使用していません。「現在」は取得時に公式栄養表へ掲載されていることを指し、各店舗の販売状況を保証しません。
+
+| チェーン | 商品グループ | サイズ・地域別variant | 公開・更新日 | 公式資料 | JSON bytes |
+| --- | ---: | ---: | --- | --- | ---: |
+| マクドナルド | 142 | 201 | 2026-09-02 | [公式栄養成分一覧HTML](https://www.mcdonalds.co.jp/quality/allergy_Nutrition/nutrient/) | 329,446 |
+| KFC | 46 | 65 | 2026-09-02 | [公式栄養成分表PDF](https://assets.ctfassets.net/jax7ylg56usf/63NsvjRmBbpZRdG8l926iQ/6e3ccb242aff8ffb2138f37b3243a5e8/44f7edfe-ba19-463b-9de5-3e8a383e833e.pdf) | 122,031 |
+| モスバーガー | 173 | 205 | 2026-08-28 | [公式栄養成分表PDF](https://www.mos.jp/menu/pdf/nutrition.pdf) | 310,832 |
+| すき家 | 191 | 499 | 2026-08-18 | [公式栄養成分一覧PDF](https://images.zensho.co.jp/materials/sukiya/allergen/nutrition.pdf) | 843,428 |
+| 吉野家 | 158 | 226 | 2026-08-27、258号 | [公式メニュー情報PDF](https://www.yoshinoya.com/pdf/allergy/) | 340,023 |
+| 松屋 | 348 | 656 | 2026-09-01／2026-06-23 | [通常店PDF](https://www.matsuyafoods.co.jp/matsuya/pdf/260901_nutritional_matsuya.pdf)、[PA・SA店PDF](https://www.matsuyafoods.co.jp/matsuya/pdf/260901_nutritional_matsuya_pa_sa.pdf)、[牧之原SA店PDF](https://www.matsuyafoods.co.jp/matsuya/pdf/260623_nutritional_matsuya_makinohara.pdf) | 1,190,070 |
+| 丸亀製麺 | 58 | 127 | 栄養情報の更新日は記載なし | [公式メニュー](https://jp.marugame.com/menu/)内の58商品ページ | 200,448 |
+| 合計 | **1,116** | **1,979** | | | **3,336,278** |
+
+JSON合計は約3.34MB（3.18MiB）。サイズを除いた同一名を商品グループとして数えます。商品・variantとも更新日や栄養値をIDに使わず、チェーン＋正規化した正式名＋公式サイズ＋地域のSHA-256先頭16桁を利用。正式名称の変更時はIDが変わるため、更新時に差分確認が必要です。過去のMealEntryは旧IDでもスナップショットから表示できます。
+
+資料ファイル・商品ページごとのURLとSHA-256、取得日、変換方法、件数は [sources.json](data-sources/restaurants/sources.json) に保存。松屋の2026年6月資料は現在も公式ページから案内される牧之原店用資料であり、現在商品のPFCを過去資料で穴埋めしたものではありません。
+
+### 正確性のための区分・例外
+
+- マクドナルド通常店とMcCafé by Barista、モスの中京エリアとモスバーガー＆カフェ、松屋の通常店・PA/SA・牧之原・沖縄を区別。同じ名称・サイズでも値が異なるものを混ぜません。
+- 吉野家PDFの多言語重複は除外。同じPDFに載る別ブランド **C&C限定メニュー24行は対象外**。沖縄・店舗限定の吉野家商品は収録します。
+- 松屋の「ライス量変更」「定食からセット変更」等の栄養増減行は食品ではないため除外。メインメニューは公式の注記どおりみそ汁込みです。みそ汁の重複追加に注意してください。
+- モスの冷凍モスチキン・ローストチキンは公式の可食部100g単位と明記。1個の値へ換算しません。
+- セットの全組み合わせは生成しません。バーガー、サイド、ドリンク、うどん、天ぷら等をカートで組み合わせます。公式表に独立した行として掲載された定食・弁当・小セットは、その公式単位を収録します。
+- すき家・松屋のPDFの縦書きカテゴリーは目視照合した区切りで復元。KFCは公式表にカテゴリ列がないため商品名からUI用に分類し、正式商品名・値は維持します。
+- 期間限定は公式ページに明示されたときだけtrue。明示情報がない表はnullであり、「通常販売」と推測しません。丸亀製麺は公式の期間限定アイコン情報と、実際に掲載されている温冷・サイズだけを使用します。
+
+### 栄養素ごとのprovenance・不明値
+
+各variantはkcal/P/F/Cそれぞれに `value / sourceType / sourceUrl / sourceTitle / publishedOrUpdatedAt / retrievedAt / notes` を持ちます。元のセル表記は `rawNutrients` に保持。現在公式・過去公式・二次情報・推定・不明を文字で区別します。
+
+今回の1,979variantは全件が現在の公式資料由来です。**4栄養素がそろう1,977件、一部または全部不明2件**。栄養素単位では現在公式7,911値、不明5値、過去公式0・二次情報0・推定0です。公式自体が配合から計算した値も「公式」であり、アプリが推定した値とは区別します。
+
+- 空欄、ダッシュ、未測定・未分析、参照記号「※」はnull。未対応の記号・負値は変換エラー。
+- 松屋「生ジョッキ缶」のPは公式表が `0.68～1.36` の範囲表記。平均値や0へ置き換えず、Pをnullにして原表を表示します。
+- 吉野家「ロースかつカレー」は公式表が別項目参照のため4値がnull。組み合わせを推測計算しません。
+- 不明PFC2件は検索・出典参照・お気に入りのみ。**栄養値がそろわない商品のカート追加・食事登録はUIと保存処理の両方で拒否**します。従来の数値必須MealEntryと日次集計を変更せず、不明を0gとして集計することを防ぎます。
+- ほかに吉野家の沖縄限定コカ・コーラは、原表の量欄がアイスの「シングル」と結合され、確実な量を判断できないため登録不可。隣の「さんぴん茶100ml」から量を流用しません。登録不可は合計3variantです。
+
+食事には数量を掛けたkcal/PFC、数量、元商品の全情報を保存。`restaurantSnapshot` とprovenance内の値は登録時の**1単位当たり**です。履歴で栄養を手動編集すると「手入力」に変わり、元情報は「登録時の出典」として保持します。元商品更新・削除で過去の食事を再計算しません。
+
+### 外食DBの更新方法
+
+通常のインストール・build・GitHub Actionsでは外部サイトを取得せず、生成済みJSONだけを使用します。更新作業時のみPythonの無料ライブラリを使います（アプリの依存には追加していません）。
+
+```sh
+python -m pip install beautifulsoup4 pdfplumber
+python scripts/restaurants/fetch-sources.py
+python scripts/restaurants/fetch-marugame.py
+python scripts/restaurants/convert.py --retrieved-at 2026-09-08
+```
+
+1. 各公式案内で公開版・URLを確認。将来の更新ではfetchスクリプトのURL、convert.pyのSOURCESの版・日付を実際の資料に合わせて変更します。PDFリンクは日付やファイルIDが変わります。
+2. 既存raw資料を保存した上で、明示的に `--refresh` を付けて再取得。既定では取得済みファイルを再利用します。取得日は実際に取得した日を指定してください。
+3. 403・429や取得エラーを無理に回避しません。必要なら公式ページからブラウザーで保存し、スクリプトに指定された `data-sources/restaurants/raw/` のファイル名へ配置。丸亀はページのHTML（公開 __NEXT_DATA__ を含む）を保存します。
+4. 変換は必須列・版の日付・ページ構造・件数の下限・負値・未知記号・ID/variant衝突で停止します。すき家のカテゴリー境界の商品名が変わった場合も停止。想定外の変更はPDF/HTMLを目視確認し、変換規則を直してください。`inspect-pdf.py` で手元PDFの文字・表を抽出できます。
+5. 名称、サイズ、地域、朝メニュー、付属品、100g単位を再照合。名称変更によるID差分、収録件数の増減、版・取得日・JSONサイズを確認し、READMEとテストの期待件数を更新します。各チェーンの全検証が成功するまで既存JSONを置き換えません。
+6. `pnpm test` → `pnpm run build` → 本番プレビューでオフライン確認。生成済み7JSONとsources.jsonをGit対象にします。元PDF/HTML、キャッシュ、テスト結果は.gitignore対象です。
+
+### 第3A-1の保存・オフライン仕様
+
+IndexedDBはv3。v1・v2のスキーマを残し、既存6テーブルを消去・再作成せず、mealsへ店舗ID・注文IDのインデックスだけを追加。MealEntryの外食フィールドはすべてoptionalです。favoritesは既存テーブルに2種別を追加し、専用の店舗履歴テーブルは作りません。
+
+7JSONはViteのpublic/dataに置き、Service Workerで事前キャッシュ。初回更新完了後は店検索・商品検索・詳細・カート・食事登録・お気に入り・最近使った店をオフライン利用できます。出典リンクは利用者が開いた場合だけ外部サイトへ移動します。PWAの `/meal-log/`、manifest、アイコン、更新通知、既存Actionsを維持します。
+
+## 維持する第1・第2段階の機能
 
 - 日本食品標準成分表2,538食品のオフライン検索。部分一致、全半角、英字大小、ひらがな／カタカナ、主要な日本語別名に対応。
 - 重量指定による栄養計算と登録。50 / 100 / 150 / 200 / 250g、自由入力。
@@ -15,7 +92,7 @@ iPhone 14向けのカロリー・PFC・体重記録PWA。React / TypeScript / Vi
 - 食品・レシピをまとめた「いつものセット」の作成・編集・一括登録。
 - 表示日の前日の食事を区分ごとに選び、確認してコピー。コピー済み記録は除外。
 - 名前省略可能なカロリーだけの入力。PFCは0g。
-- 外食21チェーンの店名・カテゴリー検索と案内画面。実メニュー・栄養値は未収載。
+- 外食21チェーンの一覧を維持。今回の7チェーンを除く14チェーンは案内画面。
 
 第1段階のホーム、履歴・詳細・編集・削除、手入力、体重、目標・表示設定、簡易分析は維持しています。
 
@@ -99,29 +176,27 @@ PFCのTrは最小記載量0.1gの1/10以上・5/10未満（0.01g以上0.05g未�
 
 かんたん入力はカロリー必須、名前省略時は「かんたん入力」、PFCは0、sourceTypeはmanualです。
 
-## IndexedDB v1 → v2
+## IndexedDB v1 → v2 → v3
 
-DB名は引き続き **meal-log**。`version(1)` の定義を残し、`version(2)` を追加。Dexieによる追加スキーマ移行が初回起動時に自動で行われます。手作業によるデータ消去は不要です。
+DB名は引き続き **meal-log**。`version(1)` の定義を残し、`version(2)` を追加。第3A-1ではv1・v2定義を両方残し、v3でmealsのrestaurantId / restaurantOrderIdインデックスだけを追加。Dexieによる追加スキーマ移行が初回起動時に自動で行われます。手作業によるデータ消去は不要です。
 
 | テーブル | 変更 |
 | --- | --- |
 | meals | 既存行は無変更。sourceId、setId、コピー元・対象日の複合インデックス追加 |
 | weights / settings | スキーマ・データとも維持 |
-| recipes | 新規。材料配列・食数・名前・日時 |
-| favorites | 新規。種別・参照ID・量 |
-| mealSets | 新規。構成要素・合計・日時 |
+| recipes | v2の材料配列・食数・名前・日時を保持 |
+| favorites | v2の既存行を保持。kindにrestaurant / restaurantMenuを追加。スキーマ変更なし |
+| mealSets | v2の構成要素・合計・日時を保持 |
 
-材料はrecipes内へ埋め込み、食数と原子的に保存します。食品は静的JSON、店舗は静的一覧。不要な空テーブルは作りません。
+材料はrecipes内へ埋め込み、食数と原子的に保存します。食品・外食メニューは静的JSON、店舗は静的一覧。不要な空テーブルは作りません。
 
 MealEntryへ追加したsourceId / quantity / unit / sourceVersion / notes / recipeSnapshot / setId / setName / setRunId / copiedFromId / copyTargetDateはすべてoptional。従来記録は補完や書換えなしで読めます。DBのclear・deleteによる初期化はありません。既存の食事編集でも出典等の追加フィールドを保持します。日次合計は従来どおりMealEntryから計算します。
 
 テストでは旧DBに食事・体重・設定を入れて更新し、完全一致で残ることを確認します。ブラウザーテストも専用プロファイルに旧版のネイティブIndexedDBを作成して移行し、利用者のブラウザーデータには触れません。
 
-## 外食の第3段階予定
+## 次の第3A-2以降
 
-マクドナルド、KFC、モスバーガー、SUBWAY、すき家、吉野家、松屋、なか卯、丸亀製麺、はなまるうどん、CoCo壱番屋、大戸屋、ロイヤルホスト、ガスト、びっくりドンキー、ジョイフル、天下一品、餃子の王将、スシロー、くら寿司、はま寿司の21チェーンを表示します。最近使った店・お気に入り店舗の欄は案内のみです。
-
-RestaurantMenuItem / NutrientProvenanceには商品名、サイズ、栄養素ごとの値・出典、期間限定、過去公式値を持てる型を用意。今回は実メニュー・栄養値とも0件です。
+実メニューデータが残る14チェーン：SUBWAY、なか卯、はなまるうどん、CoCo壱番屋、大戸屋、ロイヤルホスト、ガスト、びっくりドンキー、ジョイフル、天下一品、餃子の王将、スシロー、くら寿司、はま寿司。今回の実装には含めていません。
 
 ## 起動・テスト
 
@@ -152,11 +227,40 @@ ChromeとPlaywrightを別途使える環境では、プレビュー起動後に�
 ```sh
 node scripts/browser-check.cjs
 node scripts/browser-stage2.cjs
+node scripts/browser-stage3.cjs
 ```
 
 第1段階のテストの既定URLはlocalhost:4173、stage2の既定URLは127.0.0.1:4175（いずれも末尾は /meal-log/）。別ポートでは `APP_URL` にプレビューURLを設定してください。出力と専用プロファイルはGit対象外の `test-results/` です。
 
-## 第2段階の最終確認結果
+## 第3A-1の最終確認結果
+
+2026年9月8日、ローカルの本番ビルドを `/meal-log/` で確認。
+
+| 確認 | 結果 |
+| --- | --- |
+| インストール | pnpm 11.19.0 / frozen-lockfile / キャッシュから成功。アプリ依存の追加なし |
+| 自動テスト | **101件成功**（第1・第2段階69件＋外食32件）、5ファイル |
+| TypeScript・本番build | `pnpm run build` 内の `tsc -b && vite build` 成功 |
+| PWA | Service Worker・manifest生成成功。23ファイル、4,898.20KiBを事前キャッシュ |
+| v1データ | 食事・体重・設定をv3で完全一致保持。単体テストと実ブラウザーで確認 |
+| v2データ | 食事・体重・設定・レシピ・お気に入り・セットの全6テーブルを完全一致保持 |
+| 第1・第2段階の回帰 | browser-check.cjs / browser-stage2.cjs 成功。手入力、体重、設定、履歴編集削除、食品、レシピ、セット、コピー等を確認 |
+| 外食操作 | 横断検索、KFC、サイズ選択、出典、店舗・商品のお気に入り、数量増減・削除、合計、昼食一括登録、ホーム・履歴反映に成功 |
+| 画面 | Chrome 390×844 / 320px、ライト／ダークで横スクロールなし。商品詳細を上まで戻してもカートバーを表示 |
+| オフライン | 専用ブラウザー終了→通信OFF→再起動。7JSONをキャッシュから読込、検索・出典詳細・登録・再読込・既存データ保持に成功 |
+| エラー | 3本のブラウザーテストでページ・コンソールエラー0件 |
+
+自動テストの結果を実機Safariの結果とは扱っていません。iPhone 14では公開後、次を確認してください。
+
+1. オンラインで既存PWAを開き、入力を保存して更新通知の「更新」を選ぶ。データ消去やPWAの削除は不要。
+2. 既存の食事・体重・設定・レシピ・お気に入り・セットが残っていることを確認。
+3. 外食でKFC等を選び、商品・サイズ・出典を確認。複数商品を追加し数量を変えて登録、ホームと履歴の合計を確認。
+4. 店舗・商品の☆を登録し、次回も表示されることを確認。320px相当は自動確認済みですが、実機でキーボード・セーフエリア・スクロールも確認。
+5. 機内モードでWi-FiもOFFにし、PWAを終了して再起動。検索・登録・再起動後の保存を確認。
+
+ローカルの結果JSONと画面画像はGit対象外の `test-results/` に保存しています。commit / pushは実行していません。
+
+## 第2段階完了時の確認記録（参考）
 
 2026年9月7日、ローカルの本番ビルドを `/meal-log/` 配下で確認しました。
 
@@ -174,7 +278,7 @@ node scripts/browser-stage2.cjs
 | オフライン | 専用ブラウザーを終了後、通信OFFで再起動。全テーブルの再読込、食品検索・登録、レシピ登録に成功 |
 | コンソール | ブラウザーテスト2本ともページエラー・コンソールエラー0件 |
 
-第2段階のiPhone実機Safari・ホーム画面PWAの確認は利用者による公開後の確認項目です。ブラウザーテストはChromeのモバイル相当設定であり、実機検証と区別しています。結果JSONと画面画像はローカルの `test-results/` に保存します。
+第2段階のiPhone実機Safari・ホーム画面PWAは、その後利用者が確認済みです。第3A-1は改めて実機で確認してください。ブラウザーテストはChromeのモバイル相当設定であり、実機検証と区別しています。結果JSONと画面画像はローカルの `test-results/` に保存します。
 
 ## PWA・オフライン・GitHub Pages
 
@@ -187,7 +291,7 @@ Vite base、manifestのid・start_url・scope、Service Worker、各アイコン
 ```sh
 git status --short
 git add .
-git commit -m "Add stage 2 food database recipes and meal tools"
+git commit -m "Add stage 3A-1 official restaurant menus and meal orders"
 git push origin main
 ```
 
@@ -201,7 +305,11 @@ iPhoneではオンラインで既存PWAを起動し、入力を保存して更�
 - `src/data/db.ts` / `catalogRepository.ts` / `copyMeals.ts` / `foods.ts`：非破壊移行・保存・静的読込。
 - `src/components/CatalogParts.tsx` / `src/styles/catalog.css`：共通UI。
 - `public/data/mext-foods.json` / `scripts/convert-foods.py` / `data-sources/mext-source.json`：食品・変換・出典。
+- `public/data/restaurants/*.json` / `scripts/restaurants/` / `data-sources/restaurants/sources.json`：7チェーンの静的メニュー・再取得変換・出典とSHA-256。
+- `src/domain/restaurantMenus.ts` / `src/data/restaurantMenus.ts` / `restaurantRepository.ts`：検索・数量・合計・読込・注文保存。
+- `src/pages/add/Restaurants.tsx` / `RestaurantDetail.tsx` / `RestaurantCart.tsx` / `src/components/RestaurantParts.tsx`：外食画面と栄養素別の出典表示。
+- `src/data/restaurants.test.ts` / `scripts/browser-stage3.cjs`：外食データ・保存・v2移行・ブラウザー・オフラインの検証。
 
 ## 今回未実装
 
-21チェーンの実メニュー栄養DB、バーコード／Open Food Facts、OCR、ChatGPT取り込み、iPhoneショートカット本番連携、本格的なグラフ、自動分析、体重と摂取の関連分析、推定維持カロリー、献立提案、CSV/JSON出入力、クラウド同期、アカウント、バックエンド。料理完成後の重量入力も実装していません。
+残り14チェーンの実メニュー栄養DB、バーコード／Open Food Facts、OCR、ChatGPT取り込み、iPhoneショートカット本番連携、本格的なグラフ、自動分析、体重と摂取の関連分析、推定維持カロリー、献立提案、CSV/JSON出入力、クラウド同期、アカウント、バックエンド。料理完成後の重量入力も実装していません。

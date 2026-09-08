@@ -1,0 +1,558 @@
+[
+  {
+    "chain": "マクドナルド",
+    "restaurantId": "restaurant:マクドナルド",
+    "sourceUrl": "https://www.mcdonalds.co.jp/quality/allergy_Nutrition/nutrient/",
+    "sourceTitle": "マクドナルド公式 栄養成分一覧表",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-02",
+    "retrievedAt": "2026-09-08",
+    "sha256": "c68b469fd73cadee0c06344fdcc318c38d30cc5062b5d3f47ca217b00e443af2",
+    "transformationMethod": "scripts/restaurants/convert.py: mcdonalds",
+    "notes": [
+      "栄養表に現掲載の値。店舗での販売を保証しない。期間限定表示が資料にない場合はnull。"
+    ],
+    "variantCount": 201,
+    "productCount": 142,
+    "partialCount": 0,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 804,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "jsonBytes": 329446,
+    "sourceFiles": [
+      {
+        "sourceUrl": "https://www.mcdonalds.co.jp/quality/allergy_Nutrition/nutrient/",
+        "file": "mcdonalds.html",
+        "sha256": "c68b469fd73cadee0c06344fdcc318c38d30cc5062b5d3f47ca217b00e443af2"
+      }
+    ]
+  },
+  {
+    "chain": "KFC",
+    "restaurantId": "restaurant:KFC",
+    "sourceUrl": "https://assets.ctfassets.net/jax7ylg56usf/63NsvjRmBbpZRdG8l926iQ/6e3ccb242aff8ffb2138f37b3243a5e8/44f7edfe-ba19-463b-9de5-3e8a383e833e.pdf",
+    "sourceTitle": "KFC公式 栄養成分表",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-02",
+    "retrievedAt": "2026-09-08",
+    "sha256": "3ed7d32fe1b790523f6dd99b8aef08e8a6cb3265b41d8e43d9454e80c8bc5e7f",
+    "transformationMethod": "scripts/restaurants/convert.py: kfc",
+    "notes": [
+      "栄養表に現掲載の値。店舗での販売を保証しない。期間限定表示が資料にない場合はnull。"
+    ],
+    "variantCount": 65,
+    "productCount": 46,
+    "partialCount": 0,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 260,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "jsonBytes": 122031,
+    "sourceFiles": [
+      {
+        "sourceUrl": "https://assets.ctfassets.net/jax7ylg56usf/63NsvjRmBbpZRdG8l926iQ/6e3ccb242aff8ffb2138f37b3243a5e8/44f7edfe-ba19-463b-9de5-3e8a383e833e.pdf",
+        "file": "kfc.pdf",
+        "sha256": "3ed7d32fe1b790523f6dd99b8aef08e8a6cb3265b41d8e43d9454e80c8bc5e7f"
+      }
+    ]
+  },
+  {
+    "chain": "モスバーガー",
+    "restaurantId": "restaurant:モスバーガー",
+    "sourceUrl": "https://www.mos.jp/menu/pdf/nutrition.pdf",
+    "sourceTitle": "モスバーガー公式 栄養成分表",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-08-28",
+    "retrievedAt": "2026-09-08",
+    "sha256": "45f01f1d6da826111ec56cbfaa61cf6c4ef878112afc3bc9cece0bbb33f7dc11",
+    "transformationMethod": "scripts/restaurants/convert.py: mos",
+    "notes": [
+      "栄養表に現掲載の値。店舗での販売を保証しない。期間限定表示が資料にない場合はnull。"
+    ],
+    "variantCount": 205,
+    "productCount": 173,
+    "partialCount": 0,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 820,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "jsonBytes": 310832,
+    "sourceFiles": [
+      {
+        "sourceUrl": "https://www.mos.jp/menu/pdf/nutrition.pdf",
+        "file": "mos.pdf",
+        "sha256": "45f01f1d6da826111ec56cbfaa61cf6c4ef878112afc3bc9cece0bbb33f7dc11"
+      }
+    ]
+  },
+  {
+    "chain": "すき家",
+    "restaurantId": "restaurant:すき家",
+    "sourceUrl": "https://images.zensho.co.jp/materials/sukiya/allergen/nutrition.pdf",
+    "sourceTitle": "すき家公式 栄養成分一覧表",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-08-18",
+    "retrievedAt": "2026-09-08",
+    "sha256": "68309de742dff7afde5ea9409d4c8d5d2d24ba04aed84be995bf587bdc0766dc",
+    "transformationMethod": "scripts/restaurants/convert.py: sukiya",
+    "notes": [
+      "栄養表に現掲載の値。店舗での販売を保証しない。期間限定表示が資料にない場合はnull。"
+    ],
+    "variantCount": 499,
+    "productCount": 191,
+    "partialCount": 0,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 1996,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "jsonBytes": 843428,
+    "sourceFiles": [
+      {
+        "sourceUrl": "https://images.zensho.co.jp/materials/sukiya/allergen/nutrition.pdf",
+        "file": "sukiya.pdf",
+        "sha256": "68309de742dff7afde5ea9409d4c8d5d2d24ba04aed84be995bf587bdc0766dc"
+      }
+    ]
+  },
+  {
+    "chain": "吉野家",
+    "restaurantId": "restaurant:吉野家",
+    "sourceUrl": "https://www.yoshinoya.com/pdf/allergy/",
+    "sourceTitle": "吉野家公式 メニュー情報258号",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-08-27",
+    "retrievedAt": "2026-09-08",
+    "sha256": "11ab23d18c2fa4e8f279a83dd0c43ca5edbb05d360dbff563104da1d8b18b165",
+    "transformationMethod": "scripts/restaurants/convert.py: yoshinoya",
+    "notes": [
+      "栄養表に現掲載の値。店舗での販売を保証しない。期間限定表示が資料にない場合はnull。"
+    ],
+    "variantCount": 226,
+    "productCount": 158,
+    "partialCount": 1,
+    "blockedCount": 2,
+    "nutrientSourceCounts": {
+      "official": 900,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 4
+    },
+    "jsonBytes": 340023,
+    "sourceFiles": [
+      {
+        "sourceUrl": "https://www.yoshinoya.com/pdf/allergy/",
+        "file": "yoshinoya.pdf",
+        "sha256": "11ab23d18c2fa4e8f279a83dd0c43ca5edbb05d360dbff563104da1d8b18b165"
+      }
+    ]
+  },
+  {
+    "chain": "松屋",
+    "restaurantId": "restaurant:松屋",
+    "sourceUrl": "https://www.matsuyafoods.co.jp/matsuya/pdf/260901_nutritional_matsuya.pdf",
+    "sourceTitle": "松屋公式 栄養成分・アレルゲン一覧",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-01",
+    "retrievedAt": "2026-09-08",
+    "sha256": "8d05386cd0aaac8ede713b0464f3935cecd4041c3647e4fc4635562b21f258b1",
+    "transformationMethod": "scripts/restaurants/convert.py: matsuya",
+    "notes": [
+      "栄養表に現掲載の値。店舗での販売を保証しない。期間限定表示が資料にない場合はnull。"
+    ],
+    "variantCount": 656,
+    "productCount": 348,
+    "partialCount": 1,
+    "blockedCount": 1,
+    "nutrientSourceCounts": {
+      "official": 2623,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 1
+    },
+    "jsonBytes": 1190070,
+    "sourceFiles": [
+      {
+        "sourceUrl": "https://www.matsuyafoods.co.jp/matsuya/pdf/260901_nutritional_matsuya.pdf",
+        "file": "matsuya.pdf",
+        "sha256": "8d05386cd0aaac8ede713b0464f3935cecd4041c3647e4fc4635562b21f258b1"
+      },
+      {
+        "sourceUrl": "https://www.matsuyafoods.co.jp/matsuya/pdf/260901_nutritional_matsuya_pa_sa.pdf",
+        "file": "matsuya-pa-sa.pdf",
+        "sha256": "24b2e0be281afb92bef41302b3a2002862bd00a3e9ebaa3ed1b72d559598b463"
+      },
+      {
+        "sourceUrl": "https://www.matsuyafoods.co.jp/matsuya/pdf/260623_nutritional_matsuya_makinohara.pdf",
+        "file": "matsuya-makinohara.pdf",
+        "sha256": "a54fa433fd810f4db102c9efba9b8a18fda570a72b10b416d3c0a980cc011aed"
+      }
+    ]
+  },
+  {
+    "chain": "丸亀製麺",
+    "restaurantId": "restaurant:丸亀製麺",
+    "sourceUrl": "https://jp.marugame.com/menu/",
+    "sourceTitle": "丸亀製麺公式 商品別栄養情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": null,
+    "retrievedAt": "2026-09-08",
+    "sha256": "16736c20c6fe43a24b46c86d2504ec6146fb7c1a9d7c3e43f654e5d999d6db22",
+    "transformationMethod": "scripts/restaurants/convert.py: marugame",
+    "notes": [
+      "栄養表に現掲載の値。店舗での販売を保証しない。期間限定表示が資料にない場合はnull。"
+    ],
+    "variantCount": 127,
+    "productCount": 58,
+    "partialCount": 0,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 508,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "jsonBytes": 200448,
+    "sourceFiles": [
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/",
+        "file": "marugame-current.html",
+        "sha256": "16736c20c6fe43a24b46c86d2504ec6146fb7c1a9d7c3e43f654e5d999d6db22"
+      },
+      {
+        "sourceUrl": "https://marugame.com/menu/udon/",
+        "file": "marugame/udon.html",
+        "sha256": "8f00dcc53b90116b7a00856069652e8e40d600cf7d33624d48c808ad4cd99f76"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/butatsukejiru/",
+        "file": "marugame/udon-butatsukejiru.html",
+        "sha256": "91a553523df2f89d12a538999fd2467290ac1db18d8d6de998dc28466ab2857a"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/noukougyokaitsukejiru/",
+        "file": "marugame/udon-noukougyokaitsukejiru.html",
+        "sha256": "6c69eb6aa40c2610c48fc16eeb3ca1356770b70a87dfcef6bc9cd22d1f82d45d"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/gomadarebutatama/",
+        "file": "marugame/udon-gomadarebutatama.html",
+        "sha256": "c961a87757f813a124523c803edb3ad603ddba2b9d787f6900cdd8145e094f1c"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/umashio/",
+        "file": "marugame/udon-umashio.html",
+        "sha256": "0a2273032ccc6d35fa422e35e3928b25235e42e312d2cc4d2e3dc2251b66d266"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/nebatoroumashio/",
+        "file": "marugame/udon-nebatoroumashio.html",
+        "sha256": "9bbc4c3926d69e6dcc3feed72e98ae01a184ee8b2e76a387ba1f17a3694eb803"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/mentaitororobukkakeudon/",
+        "file": "marugame/udon-mentaitororobukkakeudon.html",
+        "sha256": "fc69cfb1a6e1f561f5bb426ae2d54e931cd10016319da7e340933b2e423d6487"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/hiyashimentaicreamudon/",
+        "file": "marugame/udon-hiyashimentaicreamudon.html",
+        "sha256": "c33e6b820aa438f599e829554f73090517940ab202ae92b8b77f744be75b6b1e"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/aotooroshibukkakeudon/",
+        "file": "marugame/udon-aotooroshibukkakeudon.html",
+        "sha256": "6a67e6c1def8a1530a7927003b412a74c8422d468d2cff6468983b6c9670e6d7"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/aotooroshisyoyuudon/",
+        "file": "marugame/udon-aotooroshisyoyuudon.html",
+        "sha256": "153a4f22986df4016ac2bb4179717f19f7d4f3ccb81f3cbca9e457a9cb4f556f"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/nikubukkake/",
+        "file": "marugame/udon-nikubukkake.html",
+        "sha256": "9a0c0ad06accabc7f232037bc23e96b7925224762719a95c61f231d6b52dcc3a"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/nikuudon/",
+        "file": "marugame/udon-nikuudon.html",
+        "sha256": "a49edb8fe0a7194eb768c39a09d98cfb761c87a7861edce2050a5a48d2190934"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/kamaage/",
+        "file": "marugame/udon-kamaage.html",
+        "sha256": "a999276410e937bd09072ac7cd068403f20283aa06ed205bed978e2b8580db7b"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/kake/",
+        "file": "marugame/udon-kake.html",
+        "sha256": "a1984743359806faa3dac8f5468ed8027fb601cbc9218fa733243af29541bf39"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/bukkake/",
+        "file": "marugame/udon-bukkake.html",
+        "sha256": "0984d32c16acc21e7d48d714e6e11e6dec40a510099b9fbdf68ef43a38b71ae9"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/zaru/",
+        "file": "marugame/udon-zaru.html",
+        "sha256": "993e62635729a789388be6352e3dbc7264105589fcfb221da05309f38083f4ff"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/kamatama/",
+        "file": "marugame/udon-kamatama.html",
+        "sha256": "52204f168f4bfc7e09782489c69f613a688133c0f3e5ea46d0902f99f7bb1e0b"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/mentaikamatama/",
+        "file": "marugame/udon-mentaikamatama.html",
+        "sha256": "df9fb3accb15c7881d2036dc12b24e9544316be93a1f6cf310a10cbbae44f06d"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/oroshisyouyu/",
+        "file": "marugame/udon-oroshisyouyu.html",
+        "sha256": "862d1333cac4f82c3a967357703f72e1f6c532b3740d6bb88facc2d173b9055c"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/torotama/",
+        "file": "marugame/udon-torotama.html",
+        "sha256": "8939a3706962ed84e3499a02196f204175f2e66d9e2cb7d6251baaa886e43965"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/kitune/",
+        "file": "marugame/udon-kitune.html",
+        "sha256": "a6ec44d69b5dabd94d7b947570791dc7f98caf7cc748f598dcaa69771b7ec9c7"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/curry/",
+        "file": "marugame/udon-curry.html",
+        "sha256": "0fdeeaa4eaf6c7aa45df025db3f9727d496f4dae046d000a07fd8006730f7434"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/kamaagekazokuudon/",
+        "file": "marugame/udon-kamaagekazokuudon.html",
+        "sha256": "bb7bd844e9f77133ec7abbc8f02cae43421aa6a04a8c21d43688d9668df956dd"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/okosamamanpukusetkake/",
+        "file": "marugame/udon-okosamamanpukusetkake.html",
+        "sha256": "eb1b133ded4cc211155fe7dba0e675f59032acc2caf8add56c25727ac06eaa9a"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udon/okosamamanpukusetbukkake/",
+        "file": "marugame/udon-okosamamanpukusetbukkake.html",
+        "sha256": "e632a7a841489fb5338b38d2b58e6e97e381ed7415a1769d100d15334ff7ea73"
+      },
+      {
+        "sourceUrl": "https://marugame.com/menu/tempura/",
+        "file": "marugame/tempura.html",
+        "sha256": "f1867dcc0cec38def674aae36bd6f19e92d2f24efd8a5c532f22f65ee8c6a611"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/tempura/kashiwa/",
+        "file": "marugame/tempura-kashiwa.html",
+        "sha256": "d10664efdd42545609e77caa0be8e5261d289f314d382989de92119e139a4213"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/tempura/yasaikakiage/",
+        "file": "marugame/tempura-yasaikakiage.html",
+        "sha256": "7b1b94091b08445372d3a0b8c02b4508e18ef566aebece10dccd558a895cda5e"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/tempura/ebi/",
+        "file": "marugame/tempura-ebi.html",
+        "sha256": "4836046298a4a077d5195f962df5df2b57fb1c00383d7362629388858fbc87bb"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/tempura/ika/",
+        "file": "marugame/tempura-ika.html",
+        "sha256": "78f11a9d9a4d190658ddeb64a7f4104be80d98c38938cf1c64ddea3655058f49"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/tempura/chikuwa/",
+        "file": "marugame/tempura-chikuwa.html",
+        "sha256": "43d41136d7aa3db5574e182ba52e07748bfdc694da05aa1fcc531740d96181ab"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/tempura/chikuwaisobe/",
+        "file": "marugame/tempura-chikuwaisobe.html",
+        "sha256": "2a5f9ed807823dd422243b6d9ddb019e8bfc19c1c8210fbefdb979c34388263a"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/tempura/satsumaimo/",
+        "file": "marugame/tempura-satsumaimo.html",
+        "sha256": "af844034b2840b28205ed731242459e052c5cbb14f0316f9cecffdbe5406b6e8"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/tempura/renkon/",
+        "file": "marugame/tempura-renkon.html",
+        "sha256": "963640e03d333692991c4d4477981dafcf1fcc6c4d5987fbc5cd8b5b7085e4e5"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/tempura/kabocha/",
+        "file": "marugame/tempura-kabocha.html",
+        "sha256": "6df19797bd75a2127b092dc64e716c7d3e5e44b4cb7b518d38f77e35f6bcf6fd"
+      },
+      {
+        "sourceUrl": "https://marugame.com/menu/topping/",
+        "file": "marugame/topping.html",
+        "sha256": "76466d13f8172b5751fbb279a27f27a5b6fc23c6bf2f02648fb91316c1d5326a"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/wakame/",
+        "file": "marugame/topping-wakame.html",
+        "sha256": "b3e08d0a23ee1e35123e4bfd806dfd04f5e90f12d4f04cd47952099610663012"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/shibikararayu/",
+        "file": "marugame/topping-shibikararayu.html",
+        "sha256": "e49e98ce17a9d7b2b08356d79e7d0f83732fbef03e233f880d60dbea88a49d44"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/aonegi/",
+        "file": "marugame/topping-aonegi.html",
+        "sha256": "8611310edb3dc992cf8ed641ef5600b202ecab9df4205635e89ec9fc0855788a"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/oroshishoga/",
+        "file": "marugame/topping-oroshishoga.html",
+        "sha256": "f5fe1b94fa5cf54191308879644eba36156179d2cd2df0f673c558997a6c969d"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/tenkasu/",
+        "file": "marugame/topping-tenkasu.html",
+        "sha256": "62042d27ded217c348bf8492b355f75824ac79ce055bc02f22f46c075ec6321c"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/shichimi/",
+        "file": "marugame/topping-shichimi.html",
+        "sha256": "8081b95797c58a9de439c17019912fb6eb4cdb6d00e205ffdc89676dd1f31939"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/surigoma/",
+        "file": "marugame/topping-surigoma.html",
+        "sha256": "fb93d6175d03381a025483ccc6c02aefb66b5aaee8546c7a126decfed9aabb32"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/wasabi/",
+        "file": "marugame/topping-wasabi.html",
+        "sha256": "07bf96c0555af528c959760dd26813ee1cd566dfe391dfc055fb942f6fc0babe"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/daikon/",
+        "file": "marugame/topping-daikon.html",
+        "sha256": "8bd2c94dc607e05b1324c1205691ec26b7b9fd284e4c678c5dd5cd900f5abcf8"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/mentaiko/",
+        "file": "marugame/topping-mentaiko.html",
+        "sha256": "841730f9b200bcb04996634ea3ace0958c567bbb3eeb05d34611260173c4c592"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/tororo/",
+        "file": "marugame/topping-tororo.html",
+        "sha256": "3722e01ee3d42dcd8215b623e208c634fd8d100fc6e2162260429e13065d4b77"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/sudachi/",
+        "file": "marugame/topping-sudachi.html",
+        "sha256": "e3b7a122b820e4e8744e5dd8aad780134889b64cdb4cea8f9bdf1fec2d6d3de5"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/onsentamago/",
+        "file": "marugame/topping-onsentamago.html",
+        "sha256": "5790d6882d54f3cd98a62b372b4ae0ced28ac4f03641a2c2d7206ebd01ef7fe8"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/topping/kitsune/",
+        "file": "marugame/topping-kitsune.html",
+        "sha256": "127260d98b1ec3d8fb4a5b7ab6c3e36de199c5c325e38ba05daaafc23aafb28e"
+      },
+      {
+        "sourceUrl": "https://marugame.com/menu/gohanmono/",
+        "file": "marugame/gohanmono.html",
+        "sha256": "4472630b0dc1a1d9837a6cabce7f159810d5b8faa882687bed38aee56f65ebab"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/gohanmono/inari/",
+        "file": "marugame/gohanmono-inari.html",
+        "sha256": "d7b15589b2a03376d675d74db1d9cf98767d5205829440e659ab78e4197769d2"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/gohanmono/wasabiinari/",
+        "file": "marugame/gohanmono-wasabiinari.html",
+        "sha256": "1aa5250d16186daef21e8aa4b84ca26ad116758355898900836f8e3c97046701"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/gohanmono/syake/",
+        "file": "marugame/gohanmono-syake.html",
+        "sha256": "370c8e465de06b3615a1bac8132d7242a7a1044c4a13fb7ccd64be303042c317"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/gohanmono/ume/",
+        "file": "marugame/gohanmono-ume.html",
+        "sha256": "938117ad0b915debe92583224768116fd7859a1cf30a1f3f32139317282067a2"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/gohanmono/mentaiko/",
+        "file": "marugame/gohanmono-mentaiko.html",
+        "sha256": "242bbd31ec5553b056599e9824b01af2cd7841b2fa69cbf7014f773d4b7e71ed"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/gohanmono/konbu/",
+        "file": "marugame/gohanmono-konbu.html",
+        "sha256": "5ff732cb8b06dc0c24090c49b125dc69906759385e896278066ea8b3184e4493"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/gohanmono/tendon/",
+        "file": "marugame/gohanmono-tendon.html",
+        "sha256": "b90aa8f342f70d1817be7b647a858f6d3ccc2d4abca439080be3f6d1451dbd56"
+      },
+      {
+        "sourceUrl": "https://marugame.com/menu/udonbento/",
+        "file": "marugame/udonbento.html",
+        "sha256": "bb6dd5fdd10ecc6891c6496b7dd3726f0643b986dc9b3201e0ce3db1b9ffb738"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udonbento/mentaitororoudonbento/",
+        "file": "marugame/udonbento-mentaitororoudonbento.html",
+        "sha256": "4181bc446fda9ee53b9f95440b44bd588899263c7ed5e893df3009d3ed2212e2"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udonbento/teiban/",
+        "file": "marugame/udonbento-teiban.html",
+        "sha256": "dbbc5a36455cf4712bf7bb34f1e2a3dc86937908a8d987e52276c41f884dd238"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udonbento/ebiten/",
+        "file": "marugame/udonbento-ebiten.html",
+        "sha256": "4cec98f34f6dfca6e22196ec1874c676aa4262473eab5eb6f18327334ab52fd7"
+      },
+      {
+        "sourceUrl": "https://jp.marugame.com/menu/udonbento/8r-zyrygpqsj/",
+        "file": "marugame/udonbento-8r-zyrygpqsj.html",
+        "sha256": "b973f6c01bea1f7b668201d317e30240cab03afaf095f3353f6d484a2f972190"
+      }
+    ]
+  }
+]
