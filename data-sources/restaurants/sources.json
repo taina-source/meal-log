@@ -554,5 +554,478 @@
         "sha256": "b973f6c01bea1f7b668201d317e30240cab03afaf095f3353f6d484a2f972190"
       }
     ]
+  },
+  {
+    "chain": "SUBWAY",
+    "restaurantId": "restaurant:SUBWAY",
+    "sourceUrl": "https://subway.co.jp/documents/pdf/eiyo.pdf",
+    "sourceTitle": "SUBWAY公式 栄養成分情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-02",
+    "retrievedAt": "2026-09-08",
+    "transformationMethod": "scripts/restaurants/convert-stage3a2.py: subway",
+    "notes": [
+      "取得時点の公式掲載値。全店舗で現在販売中という意味ではない。"
+    ],
+    "variantCount": 159,
+    "productCount": 131,
+    "partialCount": 0,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 636,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "sourceFiles": [
+      {
+        "chain": "SUBWAY",
+        "sourceUrl": "https://subway.co.jp/documents/pdf/eiyo.pdf",
+        "sourceTitle": "SUBWAY公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-02",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/subway.pdf",
+        "sha256": "37201104277afab8a5b90a0d6f692f850694e72349c9d97bbd7a1b9ef543d397",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: subway",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 260505
+  },
+  {
+    "chain": "なか卯",
+    "restaurantId": "restaurant:なか卯",
+    "sourceUrl": "https://images.zensho.co.jp/materials/nakau/allergen/nutrition.pdf",
+    "sourceTitle": "なか卯公式 栄養成分情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-04",
+    "retrievedAt": "2026-09-08",
+    "transformationMethod": "scripts/restaurants/convert-stage3a2.py: nakau",
+    "notes": [
+      "取得時点の公式掲載値。全店舗で現在販売中という意味ではない。"
+    ],
+    "variantCount": 349,
+    "productCount": 159,
+    "partialCount": 0,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 1396,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "sourceFiles": [
+      {
+        "chain": "なか卯",
+        "sourceUrl": "https://images.zensho.co.jp/materials/nakau/allergen/nutrition.pdf",
+        "sourceTitle": "なか卯公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-04",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/nakau.pdf",
+        "sha256": "4889677183ac952cd59400b19ad13aa97f685e12092d69822635450908bf561d",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: nakau",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 602487
+  },
+  {
+    "chain": "はなまるうどん",
+    "restaurantId": "restaurant:はなまるうどん",
+    "sourceUrl": "https://www.hanamaruudon.com/assets/pdf/allergy.pdf",
+    "sourceTitle": "はなまるうどん公式 栄養成分情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-03",
+    "retrievedAt": "2026-09-08",
+    "transformationMethod": "scripts/restaurants/convert-stage3a2.py: hanamaru",
+    "notes": [
+      "取得時点の公式掲載値。全店舗で現在販売中という意味ではない。"
+    ],
+    "variantCount": 449,
+    "productCount": 246,
+    "partialCount": 0,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 1796,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "sourceFiles": [
+      {
+        "chain": "はなまるうどん",
+        "sourceUrl": "https://www.hanamaruudon.com/assets/pdf/allergy.pdf",
+        "sourceTitle": "はなまるうどん公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-03",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/hanamaru.pdf",
+        "sha256": "0b1329ed6e12d5c88f590f251d69d639af032cfb648fda52b96059645be20b76",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: hanamaru",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 779273
+  },
+  {
+    "chain": "CoCo壱番屋",
+    "restaurantId": "restaurant:CoCo壱番屋",
+    "sourceUrl": "https://www.ichibanya.co.jp/menu/pdf/nutrition.pdf",
+    "sourceTitle": "CoCo壱番屋公式 栄養成分情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-02",
+    "retrievedAt": "2026-09-08",
+    "transformationMethod": "scripts/restaurants/convert-stage3a2.py: coco",
+    "notes": [
+      "取得時点の公式掲載値。全店舗で現在販売中という意味ではない。"
+    ],
+    "variantCount": 186,
+    "productCount": 185,
+    "partialCount": 5,
+    "blockedCount": 9,
+    "nutrientSourceCounts": {
+      "official": 724,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 20
+    },
+    "sourceFiles": [
+      {
+        "chain": "CoCo壱番屋",
+        "sourceUrl": "https://www.ichibanya.co.jp/menu/pdf/nutrition.pdf",
+        "sourceTitle": "CoCo壱番屋公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-02",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/coco-web-extract.txt",
+        "sha256": "eaabd0a1cfbdadf30283becf549cbd5ae5fa8a8bdd958dab6594fcedc0635d55",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: coco",
+        "notes": [
+          "SHA-256は公式PDFの読取テキストに対するもの（PDFバイナリではない）。自動ダウンロード403のため公開PDF本文の読取結果を行単位で確認・転記。"
+        ]
+      },
+      {
+        "chain": "CoCo壱番屋",
+        "sourceUrl": "https://www.ichibanya.co.jp/menu/pdf/nutrition.pdf",
+        "sourceTitle": "CoCo壱番屋公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-02",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/coco-web-end.txt",
+        "sha256": "e18a19153fe8a3778cc31ab63a0472eb17f123a9ea3f6ec03bbe2c4e94f94d89",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: coco",
+        "notes": [
+          "SHA-256は公式PDFの読取テキストに対するもの（PDFバイナリではない）。自動ダウンロード403のため公開PDF本文の読取結果を行単位で確認・転記。"
+        ]
+      },
+      {
+        "chain": "CoCo壱番屋",
+        "sourceUrl": "https://www.ichibanya.co.jp/menu/pdf/nutrition.pdf",
+        "sourceTitle": "CoCo壱番屋公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-02",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/coco-web-last.txt",
+        "sha256": "c47c49aa4e6bf294fbaa710d5f357bd46538a627b94b10a0327a71ff83c94bd9",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: coco",
+        "notes": [
+          "SHA-256は公式PDFの読取テキストに対するもの（PDFバイナリではない）。自動ダウンロード403のため公開PDF本文の読取結果を行単位で確認・転記。"
+        ]
+      }
+    ],
+    "jsonBytes": 298909
+  },
+  {
+    "chain": "大戸屋",
+    "restaurantId": "restaurant:大戸屋",
+    "sourceUrl": "https://www.ootoya.com/menu_list/info/nutrition/27194",
+    "sourceTitle": "大戸屋公式 栄養成分情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": null,
+    "retrievedAt": "2026-09-08",
+    "transformationMethod": "scripts/restaurants/convert-stage3a2.py: ootoya",
+    "notes": [
+      "取得時点の公式掲載値。全店舗で現在販売中という意味ではない。"
+    ],
+    "variantCount": 983,
+    "productCount": 195,
+    "partialCount": 983,
+    "blockedCount": 983,
+    "nutrientSourceCounts": {
+      "official": 2949,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 983
+    },
+    "sourceFiles": [
+      {
+        "chain": "大戸屋",
+        "sourceUrl": "https://www.ootoya.com/menu_list/info/nutrition/27465",
+        "sourceTitle": "大戸屋公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/ootoya-komaki.html",
+        "sha256": "a5e73d2e0e5e14868e139368105e0475f941a38a22037ff7c21931dd22e31145",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: ootoya",
+        "notes": []
+      },
+      {
+        "chain": "大戸屋",
+        "sourceUrl": "https://www.ootoya.com/menu_list/info/nutrition/27194",
+        "sourceTitle": "大戸屋公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/ootoya-marunouchi.html",
+        "sha256": "0b7d9ed16d03506ec3ad0bdc8667fdae3f26f14ecb82918680ca6a386c10a76a",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: ootoya",
+        "notes": []
+      },
+      {
+        "chain": "大戸屋",
+        "sourceUrl": "https://www.ootoya.com/menu_list/info/nutrition/27342",
+        "sourceTitle": "大戸屋公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/ootoya-mita.html",
+        "sha256": "d16fd13e0cc50c20701d9d37961fa6204a8235b9350e62042fc64946acdaf5f7",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: ootoya",
+        "notes": []
+      },
+      {
+        "chain": "大戸屋",
+        "sourceUrl": "https://www.ootoya.com/menu_list/info/nutrition/27303",
+        "sourceTitle": "大戸屋公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/ootoya-panjo.html",
+        "sha256": "01ff7d634c2e7f8ae6b3fd2a265bcac562f4f0074753240fdc693892e159aecf",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: ootoya",
+        "notes": []
+      },
+      {
+        "chain": "大戸屋",
+        "sourceUrl": "https://www.ootoya.com/menu_list/info/nutrition/129184",
+        "sourceTitle": "大戸屋公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/ootoya-sagamihara.html",
+        "sha256": "0803c837a2eccb5b4aa388bbf8ee870916956f7a7f9bee810fb8cdc926ed516d",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: ootoya",
+        "notes": []
+      },
+      {
+        "chain": "大戸屋",
+        "sourceUrl": "https://www.ootoya.com/menu_list/info/nutrition/101003",
+        "sourceTitle": "大戸屋公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/ootoya-utsunomiya.html",
+        "sha256": "8ec5a7d1dca5c3f0660232559756de0b27c219892e9429828373aaa420ece4b7",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: ootoya",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 2126233
+  },
+  {
+    "chain": "ロイヤルホスト",
+    "restaurantId": "restaurant:ロイヤルホスト",
+    "sourceUrl": "https://www.royalhost.jp/safety/images/default_allergen_list_260831.pdf",
+    "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-08-31",
+    "retrievedAt": "2026-09-08",
+    "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+    "notes": [
+      "取得時点の公式掲載値。全店舗で現在販売中という意味ではない。"
+    ],
+    "variantCount": 2978,
+    "productCount": 563,
+    "partialCount": 37,
+    "blockedCount": 37,
+    "nutrientSourceCounts": {
+      "official": 11802,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 110
+    },
+    "sourceFiles": [
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/default_allergen_list_260831.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-31",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost.pdf",
+        "sha256": "08835fedbd07125b0e70d242b3431a61cbf90e3949118ad346480118321a0a6c",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      },
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/pre_allergen_list_260831.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-31",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost-pre.pdf",
+        "sha256": "763392494bd296318001ea365904d725f4ae9fb2e2908f47ff4c32d5468de154",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      },
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/central_allergen_list_260803.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-03",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost-central.pdf",
+        "sha256": "ff3f93f6457eadeef6d237414e23271950d89b60340ab3e27e12bc3e45c2fb4e",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      },
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/komazawa_allergen_list_260831.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-31",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost-komazawa.pdf",
+        "sha256": "3b5f4f8049b4b12d19154b87125feb4b37c16599bbc69cf26d76cb981e4e79fc",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      },
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/nahakokusaidori_allergen_list_260831.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-31",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost-naha.pdf",
+        "sha256": "bd6c6931f70d72781fa2c89de1643f17faed24a42f2ae65d3293aac01a359248",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      },
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/parkquarter_allergen_list_260831.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-31",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost-park.pdf",
+        "sha256": "a1a4b9dce4ac220fe7140cc9dbeaf729e70505f606d99a30cd27ef3ae88d4682",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      },
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/airport_allergen_list_260831.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-31",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost-airport.pdf",
+        "sha256": "a0144c5b448b3c2458ac9459033ee8c32fb9cd595beae6aec4cb2f5b8d8937d5",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      },
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/kyusyu-university-hospital_allergen_list_260624.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-06-24",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost-hospital.pdf",
+        "sha256": "b5a29950d92aa58486581d2dfdbff79198ee6ff38d72ea7d64ea13873cb3d53d",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      },
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/nagoya-hoshigaoka_allergen_list_260831.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-31",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost-nagoya.pdf",
+        "sha256": "fb8ae1adc7e5cb23e368b21a61f7111d18cce4d91c8ae0c6f8c5122c14152ca0",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      },
+      {
+        "chain": "ロイヤルホスト",
+        "sourceUrl": "https://www.royalhost.jp/safety/images/kyototakasimaya_allergen_list_260831.pdf",
+        "sourceTitle": "ロイヤルホスト公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-31",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/royalhost-kyoto.pdf",
+        "sha256": "f945c0d2467516e48052ccd17cf1e808da376c60d06967f717869d5e031d5953",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: royalhost",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 5640064
+  },
+  {
+    "chain": "びっくりドンキー",
+    "restaurantId": "restaurant:びっくりドンキー",
+    "sourceUrl": "https://www.bikkuri-donkey.com/control-panel/uploads/2026/08/2026_0826_nutrition.pdf",
+    "sourceTitle": "びっくりドンキー公式 栄養成分情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-08-26",
+    "retrievedAt": "2026-09-08",
+    "transformationMethod": "scripts/restaurants/convert-stage3a2.py: bikkuri",
+    "notes": [
+      "取得時点の公式掲載値。全店舗で現在販売中という意味ではない。"
+    ],
+    "variantCount": 369,
+    "productCount": 198,
+    "partialCount": 0,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 1476,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "sourceFiles": [
+      {
+        "chain": "びっくりドンキー",
+        "sourceUrl": "https://www.bikkuri-donkey.com/control-panel/uploads/2026/08/2026_0826_nutrition.pdf",
+        "sourceTitle": "びっくりドンキー公式 栄養成分情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-08-26",
+        "retrievedAt": "2026-09-08",
+        "localRawFile": "stage3a2/bikkuri.pdf",
+        "sha256": "fbb0b93ed6443e543399aa682064e8636927d3876cbebfc25f64df91fca986ad",
+        "transformationMethod": "scripts/restaurants/convert-stage3a2.py: bikkuri",
+        "notes": [
+          "現在公式からリンクされる資料。各ページの更新日（4/8・5/27・8/26等）は栄養素別provenanceに保持。"
+        ]
+      }
+    ],
+    "jsonBytes": 695104
   }
 ]

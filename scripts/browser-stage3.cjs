@@ -9,7 +9,7 @@ const options = { channel: 'chrome', headless: true, viewport: { width: 390, hei
 let context, page; const errors = [], checks = [];
 function monitor() { page.on('pageerror', e => errors.push(e.message)); page.on('console', e => { if (e.type() === 'error') errors.push(e.text()); }); }
 const store = name => page.evaluate(name => new Promise((resolve,reject) => { const r=indexedDB.open('meal-log'); r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,q=db.transaction(name).objectStore(name).getAll();q.onsuccess=()=>{resolve(q.result);db.close();};};}),name);
-async function add() { await page.locator('nav').getByRole('button',{name:'食事を追加',exact:true}).click(); await page.getByRole('button',{name:'昼食',exact:true}).click(); await page.getByRole('button',{name:/^外食 7チェーン/}).click(); }
+async function add() { await page.locator('nav').getByRole('button',{name:'食事を追加',exact:true}).click(); await page.getByRole('button',{name:'昼食',exact:true}).click(); await page.getByRole('button',{name:/^外食 14チェーン/}).click(); }
 async function close() { await page.getByRole('button',{name:'閉じる',exact:true}).click(); }
 async function overflow(label) { assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,label); if(await page.locator('dialog').count()) assert.equal(await page.locator('dialog').evaluate(d=>d.scrollWidth<=d.clientWidth),true,label+' dialog'); }
 async function waitMeals(n) { await page.waitForFunction(n=>new Promise(resolve=>{const r=indexedDB.open('meal-log');r.onsuccess=()=>{const d=r.result,q=d.transaction('meals').objectStore('meals').count();q.onsuccess=()=>{resolve(q.result===n);d.close();};};}),n); }

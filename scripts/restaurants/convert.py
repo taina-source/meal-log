@@ -199,7 +199,7 @@ def marugame():
      result.append(item('marugame',nutrition['productsName'],size,[row[k] for k in ['energy','protein','fat','carbohydrate']],nutrition['category'],url='https://jp.marugame.com'+menu['href'],date=None,limited=any('limited_time_item' in v for v in detail.get('icon_select',[])),notes=['公式の1食分。温冷・サイズは公式栄養情報にある組み合わせのみ。']))
  return result
 
-def validate(chain,items):
+def validate(chain,items,minimum=None):
  unique={}
  for row in items:
   if row['restaurantId']!='restaurant:'+NAMES[chain] or not row['name'].strip():raise ValueError('Invalid restaurant/name')
@@ -209,7 +209,7 @@ def validate(chain,items):
    old['notes']=list(dict.fromkeys(old['notes']+row['notes']))
   else:unique[row['id']]=row
  items=list(unique.values())
- minimum=dict(mcdonalds=140,kfc=60,mos=150,sukiya=400,yoshinoya=190,matsuya=400,marugame=90)[chain]
+ if minimum is None:minimum=dict(mcdonalds=140,kfc=60,mos=150,sukiya=400,yoshinoya=190,matsuya=400,marugame=90)[chain]
  if len(items)<minimum:raise ValueError(f'{chain}: suspiciously small count {len(items)} < {minimum}')
  ids=set();variants=set()
  for row in items:

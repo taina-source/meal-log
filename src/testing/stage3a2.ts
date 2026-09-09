@@ -1,0 +1,10 @@
+import subway from '../../public/data/restaurants/subway.json';
+import nakau from '../../public/data/restaurants/nakau.json';
+import hanamaru from '../../public/data/restaurants/hanamaru.json';
+import coco from '../../public/data/restaurants/coco.json';
+import ootoya from '../../public/data/restaurants/ootoya.json';
+import royalhost from '../../public/data/restaurants/royalhost.json';
+import bikkuri from '../../public/data/restaurants/bikkuri.json';
+import type { RestaurantDataset } from '../domain/catalog';
+export const newDatasets = [subway, nakau, hanamaru, coco, ootoya, royalhost, bikkuri] as RestaurantDataset[];
+export const newMenus = newDatasets.flatMap(data => data.items);

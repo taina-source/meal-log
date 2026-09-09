@@ -1,4 +1,99 @@
-# Meal Log — 第3A-1段階
+# Meal Log — 第3A-2段階
+
+第3A-1の外食画面・カート・保存方式をそのまま使い、SUBWAY、なか卯、はなまるうどん、CoCo壱番屋、大戸屋、ロイヤルホスト、びっくりドンキーを追加しました。既存7チェーンのJSON・出典情報は変更していません。IndexedDBは **v3のまま**、追加のアプリ依存・バックエンド・有料サービスはありません。
+
+**大戸屋は今回、検索・出典確認・お気に入りまでです。** 取得した公式資料に炭水化物が直接掲載されていないため、糖質と食物繊維を独自に合算せずCをnullで保持し、食事登録を制限しています。他チェーンも不明値は0にせず、必要な栄養値が揃わない商品を登録できない既存の安全処理を維持します。
+
+## 第3A-2の収録データ
+
+取得日はすべて **2026-09-08**。下表のvariantは公式表のサイズ・温冷・提供条件・店舗区分を区別した行数です。商品グループ数は `productGroupId` のユニーク数。公式に載っていることは、全店舗で現在販売していることを意味しません。
+
+| チェーン | 商品グループ | variant | 登録不可 | JSON bytes | 公式資料・公開／更新日 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| SUBWAY | 131 | 159 | 0 | 260,505 | [栄養成分表](https://subway.co.jp/documents/pdf/eiyo.pdf)、2026-09-02 |
+| なか卯 | 159 | 349 | 0 | 602,487 | [栄養成分表](https://images.zensho.co.jp/materials/nakau/allergen/nutrition.pdf)、2026-09-04 |
+| はなまるうどん | 246 | 449 | 0 | 779,273 | [栄養・アレルギー表](https://www.hanamaruudon.com/assets/pdf/allergy.pdf)、2026-09-03 |
+| CoCo壱番屋 | 185 | 186 | 9 | 298,909 | [栄養成分表](https://www.ichibanya.co.jp/menu/pdf/nutrition.pdf)、2026-09-02 |
+| 大戸屋 | 195 | 983 | 983 | 2,126,233 | [店舗別栄養情報](https://www.ootoya.com/menu_list/info/nutrition/27194)など6店舗、更新日記載なし |
+| ロイヤルホスト | 563 | 2,978 | 37 | 5,640,064 | [公式資料一覧](https://www.royalhost.jp/safety/product_infomation.html)の10資料、2026-06-24／08-03／08-31 |
+| びっくりドンキー | 198 | 369 | 0 | 695,104 | [栄養成分表](https://www.bikkuri-donkey.com/control-panel/uploads/2026/08/2026_0826_nutrition.pdf)、ページごとに2026-04-08／05-27／08-26 |
+| 新7チェーン合計 | **1,677** | **5,473** | **1,029** | **10,402,575** | |
+| 既存7チェーンを含む合計 | **2,793** | **7,452** | **1,032** | **13,738,853** | |
+
+大戸屋は丸の内新東京ビル・小牧・宇都宮テラス・三田・泉北パンジョ・イオン相模原の6公式ページを収録。全店舗網羅ではありません。各URL・資料名・取得日・SHA-256・原資料名・変換方法は [sources.json](data-sources/restaurants/sources.json) の `sourceFiles` に保存しています。過去の7チェーンの出典記録も維持しています。
+
+### 栄養素別の情報源内訳
+
+以下は商品数ではなく、**各variantのkcal・P・F・Cの4セルを数えた件数**です。公式表の空欄等は出典URLを残した `unknown` とし、公式値に含めません。
+
+| チェーン | official（現在公式） | official_old | secondary | estimate | unknown |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| SUBWAY | 636 | 0 | 0 | 0 | 0 |
+| なか卯 | 1,396 | 0 | 0 | 0 | 0 |
+| はなまるうどん | 1,796 | 0 | 0 | 0 | 0 |
+| CoCo壱番屋 | 724 | 0 | 0 | 0 | 20 |
+| 大戸屋 | 2,949 | 0 | 0 | 0 | 983 |
+| ロイヤルホスト | 11,802 | 0 | 0 | 0 | 110 |
+| びっくりドンキー | 1,476 | 0 | 0 | 0 | 0 |
+| 新7チェーン合計 | **20,779** | **0** | **0** | **0** | **1,113** |
+| 14チェーン合計 | **28,690** | **0** | **0** | **0** | **1,118** |
+
+新7チェーンの栄養値が一部不明のvariantは1,025件。これにCoCo壱の数値整合性を確認できない4件を加え、登録不可は1,029件です。現在の公式ページからリンクされている資料は、ページ更新月が古くても `official` とし、実際の更新日を栄養素ごとに残しています。現在商品へ過去・別サイズの値を流用していません。
+
+### チェーンごとの計算・variant方針
+
+- **SUBWAY**：おすすめのパン・ドレッシング等を含む公式標準構成と、パン・トッピング・ドリンク等の公式単品を区別。パン置換や野菜変更の独自差分計算はありません。単品を追加する際は、標準構成に既に含まれる材料の二重加算に注意してください。
+- **なか卯**：公式に掲載された並盛・大盛等を選択。丼・麺・朝食・サイド等を公式の1食単位で収録。
+- **はなまる**：公式のサイズ・温冷・沖縄／一部店舗等を分離。うどんと天ぷら・いなり等は別商品としてカートへ追加。PDF表境界の欠落セルは同じ原表の行と既知セルを照合して復元し、推測で埋めていません。
+- **CoCo壱**：通常のライス300g、資料に明記された250gや100g／200g等だけをvariant化。基本カレー＋公式トッピング単品を合算し、米100gの独自足し引きはしません。パッケージ参照で値がない5件はnull。お子さまメニュー4件は公式掲載値を保存しつつ、kcalとPFCの整合性を解消できなかったため理由付きで登録不可です。
+- **大戸屋**：糖質・食物繊維はCの原資料注記として残し、Cはnull。白ご飯込みの定食・単品・店舗を混同しません。糖質を炭水化物と同一視したり、合算値を現在公式Cとして登録したりしません。
+- **ロイヤルホスト**：通常店、先行改定、都心中心部他、駒沢、那覇国際通り、駒沢パーククォーター、空港、九州大学病院、名古屋星ヶ丘、京都髙島屋S.C.の10資料を分離。朝食・ランチ・店舗限定の条件もvariantへ保持。同じ名前でも提供条件が違えば別行とし、37件の栄養不明商品は登録不可。
+- **びっくりドンキー**：S／M／Lは公式表記のまま選択し、根拠のない150g等への換算はしません。ディッシュ・ステーキ・ランチ・持ち帰りを分離。符号付きの増減量は独立した食事商品として収録していません。
+
+単純なセットの全組み合わせは生成しません。公式に独立した栄養値があるセット・定食は、その単位で収録します。数量を掛けた栄養値を商品ごとのMealEntryへ保存し、共通 `restaurantOrderId` で注文をまとめます。`restaurantSnapshot` は数量を掛ける前の1単位と栄養素別provenanceを保存します。
+
+混在出典の代表 `sourceType` は既存規則を維持し、**estimate → secondary → official_old → official** の順に弱い情報源を優先。unknownを含む商品は保存前に拒否します。実データに過去公式・二次・推定は今回ありませんが、混在時の表示・保存をテストしています。公式JSONを更新しても過去MealEntryを再計算しません。
+
+## 第3A-2の取得・変換・更新方法
+
+通常の起動・build・GitHub Actionsでは取得も変換も行いません。生成済み7JSONをGitへ含め、raw PDF／HTML／抽出キャッシュは `.gitignore` の対象です。開発用のPythonには `beautifulsoup4` と `pdfplumber` が必要です。画像で照合する場合は `pypdfium2` を使います。
+
+1. 各公式メニュー／栄養情報ページから現行資料を確認します。`fetch-stage3a2.py` のURL一覧は今回取得版です。新しいPDFへリンクが変わった場合は一覧も更新してください。
+2. 未取得分だけの保存は `python scripts/restaurants/fetch-stage3a2.py --remaining`。既存ファイルは再取得しません。特定資料の更新は `--file nakau.pdf --refresh` 等で明示します。403／429を回避する処理はありません。
+3. 自動取得できない資料は公式画面から手動保存します。CoCo壱は自動PDFダウンロードが403だったため、実際の公開PDF本文の読取結果を行単位で照合・転記しました。今回の再変換入力は [coco-reviewed.json](scripts/restaurants/coco-reviewed.json)。`prepare-coco-transcription.py` は今回版の全378行と日付を検証する補助スクリプトです。次版では公式PDFのページ・商品・分量・4栄養値・注記を照合して転記データを更新してください。SHA-256は保存した読取テキストに対するもので、PDFバイナリのハッシュではありません。
+4. 必要なら `python scripts/restaurants/render-source.py hanamaru 6` のように資料名と1始まりのページ番号を指定し、rawディレクトリへ出力した画像で列境界を確認。取得日・公開日・原資料URLを更新し、新版の列位置・単位・商品名を確認してから変換します。
+5. 今回取得版の再変換は `python scripts/restaurants/convert-stage3a2.py --retrieved-at 2026-09-08`。将来の再取得時は実際の取得日を指定します。`--chain nakau` 等で1チェーンのみの変換も可能。既存の `convert.py` は第3A-1の7JSONを再生成するため、今回の追加だけなら実行しません。
+6. 必須列・特殊値・負値・ID重複・variant衝突・出典URL・件数下限を検証。新版の公開日が変わった場合も停止するため、日付だけ機械的に書き換えず原表と変換規則を再確認します。CoCo転記と大戸屋HTMLも、元資料の変更を人が照合してください。
+7. `pnpm test` → `pnpm run build`。件数と差分を確認し、意図しない減少・サイズ混同・既存7JSONの変更があれば公開しません。旧7JSONのSHA-256一致を自動テストで確認します。名称変更によるID差分は確認が必要ですが、過去の記録はスナップショットなので残ります。
+
+## 第3A-2のDB・PWA・検証結果
+
+DB定義はv1／v2／v3をそのまま維持。テーブル追加・削除・clear・データ再計算はありません。静的JSONの読込対象と外食入口の表示を14チェーンへ拡張しただけで、カート・保存・集計・既存7チェーンの動作を再利用しています。
+
+`/meal-log/`、manifest、アイコン、Service Worker、main push時の既存test → build → Pages workflowを維持。外食14JSON合計 **13,738,853 bytes（約13.10MiB）**。食品DBも含むprecache対象は30エントリー、重複URLを除く25ファイルの実サイズ合計 **15,419,024 bytes（約14.70MiB）**。最大JSONは約5.38MiBで、既存の1ファイル6MiB上限内です。raw資料は配信・precacheされません。キャッシュは数十MB未満ですが、実機の空き容量やSafariの保存領域管理まで保証するものではありません。
+
+2026-09-09、ローカル本番ビルドを `/meal-log/` で確認しました。
+
+| 確認項目 | 結果 |
+| --- | --- |
+| 依存インストール | frozen-lockfileで成功。追加アプリ依存なし |
+| 全自動テスト | **143件成功**（既存101件＋第3A-2の42件）、6ファイル |
+| TypeScript／本番build | `tsc -b`、`pnpm run build` とも成功、PWA生成成功 |
+| データ品質 | 新7JSONの件数・ID・variant・出典・unknown・サイズ／分量、旧7JSONのSHA-256一致を確認 |
+| 既存データ | v1→v3、v2→v3、v3再起動で既存記録を保持。v2／v3の全6テーブルと外食スナップショットも確認 |
+| 新外食操作 | 新7店舗の検索・出典・variant・お気に入り。登録可能な6店舗の複数商品・数量・注文保存・ホーム・履歴反映。大戸屋はC不明と登録不可を確認 |
+| 既存機能 | 第1・第2段階の食品・レシピ・セット等、およびKFCの検索→variant→出典→カート増減／削除→登録→履歴を回帰確認 |
+| 画面 | Chromeの390×844／320px、ライト／ダーク、キーボードを想定した高さ440pxでも横スクロールなし |
+| オフライン | 専用ブラウザー終了→通信OFF→再起動で新7店舗検索、食事登録、再読込、保存データ保持に成功。14JSONと食品DBをキャッシュ確認 |
+| エラー | ブラウザーのページ／コンソールエラー0件。新7操作中の自動外部サイトアクセス0件 |
+
+ブラウザー検証スクリプトは `scripts/browser-check.cjs`、`browser-stage2.cjs`、`browser-stage3.cjs`、`browser-stage3a2.cjs`。`APP_URL` を本番previewの `/meal-log/` URL、`PLAYWRIGHT_MODULE` を利用可能なPlaywrightへ設定して実行します。検証は専用の合成データ・ブラウザープロファイルを使い、利用者の保存データは開きません。結果・画像はGit対象外の `test-results/` へ保存します。実機Safariの検証とは区別してください。
+
+第3A-3で残る実メニューDBは **ガスト、ジョイフル、天下一品、餃子の王将、スシロー、くら寿司、はま寿司**。既存21チェーン一覧は維持します。その他の今回未実装機能は末尾に記載しています。
+
+## 第3A-1時点の実装・検証記録
+
+以下の第3A-1／第2段階の件数・容量・対象チェーンは当時の記録です。第3A-2の現在値は上記を参照してください。起動方法、DB・食品・レシピ仕様は引き続き有効です。
 
 iPhone 14向けのカロリー・PFC・体重記録PWA。React / TypeScript / Vite / Dexieを使用。追加料金0円、バックエンド・有料API・ログイン・クラウド同期なし。個人データは端末のIndexedDBだけに保存します。
 
@@ -291,7 +386,7 @@ Vite base、manifestのid・start_url・scope、Service Worker、各アイコン
 ```sh
 git status --short
 git add .
-git commit -m "Add stage 3A-1 official restaurant menus and meal orders"
+git commit -m "Add stage 3A-2 restaurant datasets and verification"
 git push origin main
 ```
 
@@ -305,11 +400,11 @@ iPhoneではオンラインで既存PWAを起動し、入力を保存して更�
 - `src/data/db.ts` / `catalogRepository.ts` / `copyMeals.ts` / `foods.ts`：非破壊移行・保存・静的読込。
 - `src/components/CatalogParts.tsx` / `src/styles/catalog.css`：共通UI。
 - `public/data/mext-foods.json` / `scripts/convert-foods.py` / `data-sources/mext-source.json`：食品・変換・出典。
-- `public/data/restaurants/*.json` / `scripts/restaurants/` / `data-sources/restaurants/sources.json`：7チェーンの静的メニュー・再取得変換・出典とSHA-256。
+- `public/data/restaurants/*.json` / `scripts/restaurants/` / `data-sources/restaurants/sources.json`：14チェーンの静的メニュー・再取得変換・出典とSHA-256。
 - `src/domain/restaurantMenus.ts` / `src/data/restaurantMenus.ts` / `restaurantRepository.ts`：検索・数量・合計・読込・注文保存。
 - `src/pages/add/Restaurants.tsx` / `RestaurantDetail.tsx` / `RestaurantCart.tsx` / `src/components/RestaurantParts.tsx`：外食画面と栄養素別の出典表示。
-- `src/data/restaurants.test.ts` / `scripts/browser-stage3.cjs`：外食データ・保存・v2移行・ブラウザー・オフラインの検証。
+- `src/data/restaurants.test.ts` / `src/data/stage3a2.test.ts` / `scripts/browser-stage3.cjs` / `scripts/browser-stage3a2.cjs`：外食データ・保存・v2/v3データ保持・ブラウザー・オフラインの検証。
 
 ## 今回未実装
 
-残り14チェーンの実メニュー栄養DB、バーコード／Open Food Facts、OCR、ChatGPT取り込み、iPhoneショートカット本番連携、本格的なグラフ、自動分析、体重と摂取の関連分析、推定維持カロリー、献立提案、CSV/JSON出入力、クラウド同期、アカウント、バックエンド。料理完成後の重量入力も実装していません。
+残り7チェーン（ガスト、ジョイフル、天下一品、餃子の王将、スシロー、くら寿司、はま寿司）の実メニュー栄養DB、バーコード／Open Food Facts、OCR、ChatGPT取り込み、iPhoneショートカット本番連携、本格的なグラフ、自動分析、体重と摂取の関連分析、推定維持カロリー、献立提案、CSV/JSON出入力、クラウド同期、アカウント、バックエンド。料理完成後の重量入力も実装していません。
