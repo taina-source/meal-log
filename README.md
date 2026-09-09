@@ -1,4 +1,161 @@
-# Meal Log — 第3A-2段階
+# Meal Log — 第3A-3段階
+
+**当初予定した21チェーンの外食実メニューDBが完成しました。** 実商品・公開栄養値・出典を収録したカタログです。未公表の栄養値は残っており、全商品のPFCが揃ったという意味ではありません。新7店舗のうちジョイフルは食事登録に対応し、ガスト・天下一品・餃子の王将・スシロー・くら寿司・はま寿司は今回、検索・詳細・出典確認・お気に入りまで利用できます。不足商品をカートへ追加・登録する操作は拒否します。
+
+既存の検索・variant・カート・注文グループ・保存・最近使った店を再利用。既存14JSONのID・件数・栄養値・出典とsources.jsonの既存14項目はSHA-256で一致を確認しました。IndexedDBは **v3のまま**。追加アプリ依存・バックエンド・有料API・ログイン・クラウドなし。commit / pushは行っていません。
+
+## 第3A-3の収録件数・公式出典
+
+取得日：**2026-09-09**。variantは原資料のサイズ・地域・時間帯・提供単位を区別した行です。現在の公式表への掲載は、全店舗での販売を保証するものではありません。
+
+| チェーン | 商品グループ | variant | 登録不可 | JSON bytes | 主な公式資料 | 公開・更新日 |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| ガスト | 324 | 389 | 389 | 1,047,857 | [メニュー](https://www.skylark.co.jp/gusto/menu/)が参照する[公式JSON](https://www.skylark.co.jp/gusto/menu/json/menu_detail.json) | 記載なし |
+| ジョイフル | 300 | 345 | 0 | 649,088 | [栄養成分・アレルゲンPDF](https://www.joyfull.co.jp/cal_pdf/cal.pdf) | 2026-09-08 |
+| 天下一品 | 17 | 34 | 34 | 96,504 | [東側地域](https://www.tenkaippin.co.jp/allergy_e/)・[西側地域](https://www.tenkaippin.co.jp/allergy_w/)の現在公式商品一覧 | 2025-08-01 |
+| 餃子の王将 | 70 | 266 | 266 | 747,098 | [東日本](https://www.ohsho.co.jp/menu/east/)・[西日本](https://www.ohsho.co.jp/menu/west/)・[中国九州](https://www.ohsho.co.jp/menu/south/)と商品詳細 | 記載なし |
+| スシロー | 220 | 226 | 226 | 608,042 | [新宿三丁目店](https://www.akindo-sushiro.co.jp/menu/menu_detail/?s_id=869)・[道頓堀店](https://www.akindo-sushiro.co.jp/menu/menu_detail/?s_id=1019)、[公式FAQ](https://www.akindo-sushiro.co.jp/faq/) | 記載なし |
+| くら寿司 | 339 | 354 | 354 | 909,854 | [アレルゲン・カロリーPDF](https://www.kurasushi.co.jp/common/pdf/kura_allergen.pdf?260904=) | 2026-09-04 |
+| はま寿司 | 539 | 586 | 586 | 1,508,640 | [店内用カロリー・アレルゲンPDF](https://images.zensho.co.jp/materials/hama-sushi/allergen/allergen.pdf) | 2026-09-08 |
+| **今回7店** | **1,809** | **2,200** | **1,855** | **5,567,083** | | |
+| **21店累計** | **4,602** | **9,652** | **2,887** | **19,305,936** | 既存14店は変更なし | |
+
+ジョイフルは原表356行を取り込み、同一商品・条件・値の重複を整理して345variant。スシローは上記2店舗の実掲載を確認した範囲です。価格だけの違いは重複化せず、内容・値が異なる記載は提供条件を分離しました。全店舗限定品の網羅は保証しません。
+
+provenanceの内訳は **商品数ではなく栄養素数（1variantにつきkcal/P/F/Cの4個）** です。数値のない商品カタログの出典が公式でも、その栄養素はunknownです。
+
+| 対象 | official | official_old | secondary | estimate | unknown |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| ガスト | 372 | 0 | 0 | 0 | 1,184 |
+| ジョイフル | 1,380 | 0 | 0 | 0 | 0 |
+| 天下一品 | 0 | 0 | 0 | 0 | 136 |
+| 餃子の王将 | 0 | 0 | 0 | 0 | 1,064 |
+| スシロー | 201 | 0 | 0 | 0 | 703 |
+| くら寿司 | 335 | 0 | 0 | 0 | 1,081 |
+| はま寿司 | 584 | 0 | 0 | 0 | 1,760 |
+| **今回7店** | **2,872** | **0** | **0** | **0** | **5,928** |
+| **21店累計** | **31,562** | **0** | **0** | **0** | **7,046** |
+
+## チェーン固有の取り扱い
+
+- **ガスト**：公式JSONから商品・時間帯・カロリーを取得。塩分や一部糖質があっても、糖質をCへ置き換えません。P/F/Cはnull。カロリー空欄17variantも0にしません。
+- **ジョイフル**：kcal/P/F/Cの掲載順を保持。店内とテイクアウトを分離し、原表カテゴリ（町中華、トッピング、朝食、ランチ等）も保持。ライスは原表の通常量。セットに含まれないドリンクバー・スープバーや卓上調味料の栄養を足しません。ライス差分・セット全組み合わせを生成しません。
+- **天下一品**：現在公式から案内される地域別17商品×2地域。現資料はアレルゲン中心です。[2024年の旧公式PDF](https://www.tenkaippin.co.jp/wp-content/uploads/2024/11/tenkaippin_allergy_east2411.pdf)もアレルゲン資料で、流用できる同一商品・量のPFCを確認できませんでした。旧栄養ページは取得できず、二次サイトの一般料理の推定、家麺・コンビニ監修品などは店内商品と同一ではないため採用していません。kcalも含めnullです。
+- **餃子の王将**：3地域の実商品名・通常／ジャストサイズを分離。餃子は公式の1人前6個／3個を保存。現在メニューと公式アレルゲン資料に対象のkcal/PFCを直接支持する値がなく、過去値・二次値も地域・量・現在商品の同一性を確認できませんでした。大阪王将や通販品の値、料理名からの推定は使いません。
+- **回転寿司3社**：kcalは公式資料の提供単位。P/F/Cはnullです。スシローは公式FAQでも他の栄養分が非公表と案内されています。一般食品や他社のPFCは流用しません。貫数が明示された商品だけpiecesPerServingを設定し、記載がなければ **「1皿」** と表示。1皿＝2貫とは推測しません。持ち帰りは商品名の人数・内容に対応するセット単位、ドリンク・調味料はその公開単位を保持。スシローの20ドリンクは **100ml当たり** の記載で、1杯の値に置き換えません。くら寿司のサイド類は原表の1皿／1杯、末尾の栄養未掲載品はnull。はま寿司は地域条件、朝食欄、5g／一袋等の調味料を区別します。
+
+数量表示は既存quantityを使い、単位があると「3皿」、貫数が判明していれば「合計6貫相当」と表示します。**今回の実際の寿司商品はPFC不足により登録不可**です。この数量計算UIの自動検証は、本番JSONと分離した明示的なテスト専用fixtureで行っています。
+
+### はま寿司の3行補正と原表内の矛盾
+
+PDFを画像化して5／6ページの列位置と数値を照合しました。
+
+| 商品名（表示用の括弧対を整えた名称） | 原表kcal |
+| --- | ---: |
+| (北海道限定)レアステーキ三種盛り(びんちょう、サーモン、アカイカ) | 168 |
+| (北海道以外)サーモン三種(サーモン・大トロサーモン・レアステーキ) | 157 |
+| (北海道限定)サーモン三種(サーモン・大トロサーモン・レアステーキ) | 164 |
+
+最初の名称は原PDFでカロリー列へはみ出し、抽出文字列に二重閉じ括弧も含まれるため、表示名の余分な末尾括弧1個を除去しました。数値は原画像どおりです。補正理由は各商品のnotesにも残しています。
+
+補正はPDFのSHA-256 `d80d1b64f4da4c64e06eb0a7c3f84c42fa274d2e55b5a4254f2c70eadcd7e252` と元の商品名セル・カロリーセルの完全一致で限定し、3行すべてに一致しなければ停止します。新版PDF・変更セル・補正対象の欠落で停止することを自動テストしました。
+
+ほかにホット抹茶ラテSは84／105kcal、Mは118／147kcalの同名同サイズ記載があり、提供条件の区別を確認できません。値を選んだり架空のvariant条件を作らず、2variantのカロリーをnull、原表の両値をrawNutrientsとprovenance notesに保存しています。朝食の明示された欄は独立variantです。
+
+## 型・DB・スナップショット
+
+RestaurantMenuItemにoptionalのservingBasis、quantityUnit、piecesPerServingを追加。旧JSON／旧MealEntryをそのまま読めます。DB定義のv1／v2／v3、6テーブル、移行処理は変更していません。個人データのclear・削除・過去記録の再計算はしません。
+
+数量を掛けたkcal/PFCを商品別MealEntryに保存し、同一注文はrestaurantOrderIdでまとめます。restaurantSnapshotは1単位の値・提供単位・商品情報・栄養素別provenanceを複製保存する既存仕様。公式JSONを更新しても過去記録は変化しません。
+
+代表sourceTypeは従来どおり **estimate → secondary → official_old → official** の優先で弱い出典を選択します。unknown、出典valueと商品数値の不一致、負値・非数・不完全な栄養情報は登録を拒否します。混在する過去公式・二次・推定の表示／保存規則もテスト用データで確認し、今回の実データには無理に追加していません。
+
+## 外食DBの取得・再変換・更新
+
+実行時・GitHub Actions時に外部栄養サイトへアクセスしません。生成JSONをGitへ含めます。原本・抽出キャッシュ・確認画像は `data-sources/restaurants/raw/stage3a3/` に置き、Git対象外・配信対象外です。
+
+1. 既存14JSONと出典の基準ハッシュは `data-sources/restaurants/stage3a2-baseline.json` と `stage3a2-source-baseline.json`。意図的な旧データ更新を伴わない今回の作業では書き換えません。
+2. PythonにBeautifulSoup4、pdfplumber、pypdfium2を用意し、`python scripts/restaurants/fetch-stage3a3.py`。保存済みファイルを再利用します。更新する資料だけ `--file hama.pdf --refresh` 等で指定。403／429の回避や継続再試行はしません。
+3. ジョイフルは自動PDF取得が403だったため、ブラウザーで公開されているPDFの読取本文を用い、全1510行・356商品行・11ページを照合しました。再変換用の `scripts/restaurants/joyfull-reviewed.json` はGit対象の転記データです。`prepare-joyfull-transcription.py` は今回版の保存済みjoyfull-reader-*.txt（L番号・P番号付き全文）と転記の完全一致を検証します。本文のSHA-256をsourcesに残し、PDFバイナリのハッシュとは区別しています。
+4. 次版のジョイフルは公式PDFをブラウザーから保存・確認し、名称／カテゴリ／提供条件／ページ／kcal/P/F/Cをreviewedファイルへ転記します。原PDFの列順・注記・全商品数と照合してから公開日・件数ガードを更新してください。数値を推測して不足行を埋めないでください。
+5. 他6店は保存済み公式HTML／JSON／PDFから専用パーサーで変換。`python scripts/restaurants/convert-stage3a3.py --retrieved-at 2026-09-09`。`--chain hama` 等で1店のみも可能。将来の更新時は実際の取得日を指定します。既存のconvert.py／convert-stage3a2.pyは今回の追加では実行不要です。
+6. 必須列・版・未知記号・負値・件数下限・ID／variant重複を検証し、曖昧な衝突は停止。はま寿司新版はまず画像・元セル・重複行を確認してからガードを更新します。今回の自動補正は固定版専用です。
+7. `python scripts/restaurants/test-stage3a3.py`、`python scripts/restaurants/prepare-joyfull-transcription.py`、`pnpm test`、`pnpm run build`、`python scripts/restaurants/audit-stage3a3.py`。監査で旧14JSON・出典のSHA-256、21店の件数／provenance／unknown、配信JSONの一致とキャッシュ実容量を確認します。
+8. IDに栄養値・取得日を使いません。名前・条件変更に伴うID差分は確認します。過去MealEntryは変更しません。新資料のタイトル・URL・公開日・取得日・localRawFile・sha256・変換方法・注記はsources.jsonへ追加します。
+
+## PWA・容量・GitHub Pages
+
+Vite base／manifest／Service Worker／アイコン／既存Actionsは **/meal-log/** を維持。21JSONと食品DBをprecacheし、初回更新後はオフラインで検索・詳細・出典の保存内容・登録可能商品の保存・お気に入り・最近使った店を利用できます。外部リンクは利用者が開いた場合だけ通信します。
+
+| 対象 | 実ファイル容量 |
+| --- | ---: |
+| 新7JSON | 5,567,083 bytes（約5.31MiB） |
+| 21外食JSON | 19,305,936 bytes（約18.41MiB） |
+| 最大単一JSON（ロイヤルホスト、既存） | 5,640,064 bytes（約5.38MiB） |
+| 食品DB・本体等を含むprecache | 20,986,880 bytes（約20.02MiB） |
+| precache件数 | 37エントリー／重複URLを除く32実ファイル |
+
+既存6MiBの単一ファイル上限内です。20MiB程度に収まり、provenanceを削減する変更はしていません。raw PDF／HTML／画像・テスト結果はprecacheに含まれません。iPhoneの空き容量やSafariの保存領域管理は実機で確認してください。
+
+## 第3A-3の最終確認
+
+- アプリ自動テスト **199件成功**（既存143件＋追加56件、7ファイル）。原資料補正のPython回帰テスト **4件成功**。Joyfull転記の全1510行／356商品行照合とデータ監査も成功。
+- TypeScript型チェック、本番build、PWA生成成功。追加アプリ依存なし。
+- Chromeの390×844／320px、ライト／ダーク、高さ440pxのキーボード想定画面で、横スクロールなしを確認。
+- 新7店の検索・variant・出典・お気に入り。ジョイフルの登録、残る6店のPFC不足による登録拒否を確認。
+- KFC／CoCo壱／びっくりドンキーで検索→variant→出典→カート→数量増減→登録→ホーム→履歴を確認。
+- v1→v3、v2→v3、v3再起動時に、既存の食事・体重・設定・レシピ・お気に入り・セット・外食snapshotを保持。利用者の実データを開かず、専用の合成データ／ブラウザープロファイルで検証。
+- ブラウザー終了→オフライン再起動し、21店舗検索、ジョイフル登録・再読込、従来の保存データ保持を確認。
+- ブラウザーのpage／consoleエラー0件。第3A-3操作中の自動外部サイトアクセス0件。
+- 皿数・合計貫数・単位snapshotはbrowser-serving-units.cjsのテスト専用データで確認。実際の寿司商品を登録できたという結果ではありません。
+
+ブラウザー検証：scripts配下のbrowser-check.cjs、browser-stage2.cjs、browser-stage3.cjs、browser-stage3a2.cjs、browser-stage3a3.cjs、browser-serving-units.cjs。既存Playwrightを使う場合はPLAYWRIGHT_MODULE、URLはAPP_URL=http://127.0.0.1:4175/meal-log/を設定します。結果と画像はGit対象外のtest-resultsへ保存します。
+
+### iPhone実機での確認
+
+1. GitHub Pages更新後、ホーム画面PWAの更新案内から新版へ切り替える。
+2. 既存の食事・体重・設定・レシピ・お気に入り・セットが残っていること。
+3. 外食トップの21店舗と「まぐろ」検索、店舗名・1皿／1貫／100ml／セットの表示。
+4. ジョイフルのカート増減・登録と、KFC／CoCo壱／びっくりドンキーの従来操作。
+5. PFC不足商品の検索・出典・お気に入りは可能で、登録は禁止されていること。
+6. 初回更新完了後、機内モード→PWA終了→再起動し、検索・既存データ・登録可能商品の保存を確認。
+7. 実際のノッチ・ホームインジケータ・日本語キーボード・ライト／ダークの使い勝手。
+
+## 起動・公開・残る制約
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm test
+pnpm run build
+pnpm preview
+```
+
+GitHubへ反映する際は、差分を確認して利用者が実行してください。
+
+```sh
+git branch --show-current
+git status --short
+git diff --stat
+pnpm test
+pnpm run build
+git add README.md src scripts data-sources/restaurants public/data/restaurants
+git diff --cached --stat
+git commit -m "Add stage 3A-3 restaurant data and serving units"
+git push origin main
+```
+
+現在のブランチがmainであることを確認してください。mainへのpushで既存Actionsがtest→build→Pagesへデプロイします。raw・node_modules・dist・test-resultsは.gitignoreで除外済みです。
+
+21チェーンの実商品収録は完了していますが、未公表PFC、提供量が特定できない値、原表内の矛盾、店舗限定品の網羅、今後のメニュー更新は制約として残ります。不足値を推測で埋めて登録可能にしていません。
+
+引き続き未実装：ChatGPT取り込み、ショートカット本番連携、写真解析、バーコード、Open Food Facts、OCR、本格グラフ、自動傾向分析、体重×摂取カロリー分析、推定維持カロリー、残りPFC食事提案、CSV/JSON Export・Import、クラウド同期、アカウント、バックエンド。
+
+以下は過去段階の記録です。件数・容量・未収録チェーンの記載は当時の状態を保存しています。
+
+---
+
+# 第3A-2時点の実装・検証記録
 
 第3A-1の外食画面・カート・保存方式をそのまま使い、SUBWAY、なか卯、はなまるうどん、CoCo壱番屋、大戸屋、ロイヤルホスト、びっくりドンキーを追加しました。既存7チェーンのJSON・出典情報は変更していません。IndexedDBは **v3のまま**、追加のアプリ依存・バックエンド・有料サービスはありません。
 

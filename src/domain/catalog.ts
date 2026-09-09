@@ -30,6 +30,10 @@ export interface RestaurantMenuItem {
   nutrientProvenance: Record<keyof Nutrients, NutrientProvenance>;
   rawNutrients: Record<keyof Nutrients, string>;
   isLimitedTime: boolean | null; isCurrent: boolean; sourceVersion: string; notes: string[];
+  /** Official nutrition basis; absent for older snapshots. */
+  servingBasis?: string;
+  quantityUnit?: string;
+  piecesPerServing?: number | null;
   registrationBlockedReason?: string;
   availableFrom?: string; availableUntil?: string;
   nutrients?: { [K in keyof Nutrients]: { value: number | null; source: NutrientProvenance } };

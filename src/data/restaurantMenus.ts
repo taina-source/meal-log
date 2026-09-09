@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { RestaurantDataset, RestaurantMenuItem } from '../domain/catalog';
-export const restaurantFiles = ['mcdonalds', 'kfc', 'mos', 'sukiya', 'yoshinoya', 'matsuya', 'marugame', 'subway', 'nakau', 'hanamaru', 'coco', 'ootoya', 'royalhost', 'bikkuri'] as const;
+export const restaurantFiles = ['mcdonalds', 'kfc', 'mos', 'sukiya', 'yoshinoya', 'matsuya', 'marugame', 'subway', 'nakau', 'hanamaru', 'coco', 'ootoya', 'royalhost', 'bikkuri', 'gusto', 'joyfull', 'tenka', 'ohsho', 'sushiro', 'kura', 'hama'] as const;
 let cached: Promise<RestaurantMenuItem[]> | undefined;
 export function loadRestaurantMenus() {
   cached ??= Promise.all(restaurantFiles.map(async name => {

@@ -12,7 +12,7 @@ export function searchMenus(items: RestaurantMenuItem[], stores: Restaurant[], q
   const tokens = query.trim().split(/\s+/).map(normalizeSearch);
   return items.filter(item => {
     const store = stores.find(s => s.id === item.restaurantId);
-    const text = normalizeSearch([store?.name, ...(store?.aliases ?? []), item.name, ...item.aliases, item.size, item.variantName].join(' '));
+    const text = normalizeSearch([store?.name, ...(store?.aliases ?? []), item.name, ...item.aliases, item.size, item.variantName, item.servingBasis].join(' '));
     return tokens.every(token => text.includes(token));
   });
 }
@@ -23,12 +23,13 @@ export function menuGroups(items: RestaurantMenuItem[]) {
 }
 export function completeNutrients(item: RestaurantMenuItem): Nutrients {
   if (item.registrationBlockedReason) throw new Error(item.registrationBlockedReason);
+  if (nutrientKeys.some(key => item.nutrientProvenance[key].sourceType === 'unknown' || item.nutrientProvenance[key].value !== item[key])) throw new Error('栄養情報の出典が不明または値と一致しないため登録できません。');
   const { calories, protein, fat, carbs } = item;
   if (calories === null || protein === null || fat === null || carbs === null) throw new Error('PFC情報なし・栄養値が一部不明のため登録できません。');
   if ([calories, protein, fat, carbs].some(v => !Number.isFinite(v) || v < 0)) throw new Error('栄養値が正しくありません。');
   return { calories, protein, fat, carbs };
 }
-export function isComplete(item: RestaurantMenuItem) { return !item.registrationBlockedReason && nutrientKeys.every(key => item[key] !== null && Number.isFinite(item[key]) && item[key]! >= 0); }
+export function isComplete(item: RestaurantMenuItem) { return !item.registrationBlockedReason && nutrientKeys.every(key => item[key] !== null && Number.isFinite(item[key]) && item[key]! >= 0 && item.nutrientProvenance[key].sourceType !== 'unknown' && item.nutrientProvenance[key].value === item[key]); }
 export function validQuantity(quantity: number) { if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) throw new Error('数量は1〜99で指定してください。'); return quantity; }
 export function changeCart(lines: RestaurantCartLine[], item: RestaurantMenuItem, quantity: number): RestaurantCartLine[] {
   if (quantity === 0) return lines.filter(line => line.item.id !== item.id);
@@ -53,3 +54,6 @@ export function recentRestaurants(meals: MealEntry[], now = Date.now()) {
   }
   return [...scores.values()].sort((a,b) => b.score - a.score || b.lastUsedAt.localeCompare(a.lastUsedAt));
 }
+
+export function quantityLabel(line: RestaurantCartLine) { return `${line.quantity}${line.item.quantityUnit ?? ''}`; }
+export function piecesLabel(line: RestaurantCartLine) { const pieces = line.item.piecesPerServing; return pieces != null && pieces > 0 ? `合計 ${pieces * line.quantity}貫相当` : ''; }

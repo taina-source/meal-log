@@ -20,6 +20,7 @@ import { saveMeal, saveSettings, saveWeight } from './repository';
 import { defaultSettings } from '../domain/types';
 import { foodItem } from '../domain/foods';
 import { rice, sampleRecipe } from '../testing/fixtures';
+import { stage3a3Datasets } from '../testing/stage3a3';
 import { newDatasets } from '../testing/stage3a2';
 const datasets = [mcd, kfc, mos, sukiya, yoshinoya, matsuya, marugame];
 const items = datasets.flatMap(d => d.items as RestaurantMenuItem[]);
@@ -45,14 +46,14 @@ describe('公式外食データ品質', () => {
       }
     }
   });
-  it('既存7JSONを含む全14ファイルをbase配下から読み込む', async () => {
+  it('既存14JSONを含む全21ファイルをbase配下から読み込む', async () => {
     const fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => {
       const name = String(input).split('/').pop()?.replace('.json', '');
       const index = restaurantFiles.indexOf(name as typeof restaurantFiles[number]);
       expect(String(input)).toMatch(/\/meal-log\/data\/restaurants\//);
-      return new Response(JSON.stringify([...datasets, ...newDatasets][index]), { status: 200 });
+      return new Response(JSON.stringify([...datasets, ...newDatasets, ...restaurantFiles.slice(14).map(name => stage3a3Datasets.find(d => d.items[0].id.startsWith(name + '-'))!)][index]), { status: 200 });
     });
-    try { expect(await loadRestaurantMenus()).toHaveLength(1979 + newDatasets.reduce((n,d) => n + d.items.length,0)); expect(fetch).toHaveBeenCalledTimes(14); } finally { fetch.mockRestore(); }
+    try { expect(await loadRestaurantMenus()).toHaveLength(1979 + [...newDatasets, ...stage3a3Datasets].reduce((n,d) => n + d.items.length,0)); expect(fetch).toHaveBeenCalledTimes(21); } finally { fetch.mockRestore(); }
   });
   it('21チェーンを維持し第3A-1の7チェーン件数が不変', () => { expect(restaurants).toHaveLength(21); expect(new Set(items.map(i => i.restaurantId)).size).toBe(7); expect(menuGroups(items)).toHaveLength(1116); expect(items.some(i => i.restaurantId === 'restaurant:吉野家' && i.name.includes('大判豚肩'))).toBe(false); expect(items.find(i => i.restaurantId === 'restaurant:すき家' && i.name === '牛丼')?.category).toBe('牛丼'); });
   it('公式KFC実値を使い説明例の架空値を使わない', () => expect(completeNutrients(burger)).toEqual({ calories: 615, protein: 44.6, fat: 30.7, carbs: 40 }));

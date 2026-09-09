@@ -1027,5 +1027,587 @@
       }
     ],
     "jsonBytes": 695104
+  },
+  {
+    "chain": "ガスト",
+    "restaurantId": "restaurant:ガスト",
+    "sourceUrl": "https://www.skylark.co.jp/gusto/menu/json/menu_detail.json",
+    "sourceTitle": "ガスト公式 メニュー・栄養情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": null,
+    "retrievedAt": "2026-09-09",
+    "transformationMethod": "scripts/restaurants/convert-stage3a3.py: gusto",
+    "productCount": 324,
+    "variantCount": 389,
+    "blockedCount": 389,
+    "nutrientSourceCounts": {
+      "official": 372,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 1184
+    },
+    "notes": [
+      "実商品を収録。栄養値の不明はnullで保持。現掲載は全店舗での販売保証ではない。"
+    ],
+    "sourceFiles": [
+      {
+        "chain": "ガスト",
+        "sourceUrl": "https://www.skylark.co.jp/gusto/menu/",
+        "sourceTitle": "ガスト公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/gusto-index.html",
+        "sha256": "48ee1513d3c7ce02c474be54ee557f036c34df5ca6bea472c8f00b79e27f2606",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "ガスト",
+        "sourceUrl": "https://allergy.skylark.co.jp/",
+        "sourceTitle": "ガスト公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/gusto-allergy.html",
+        "sha256": "e8acdd1f69624d37c5ff2b935a3c2b0ee5f373f1efe5a39d335a739e415dda5d",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "ガスト",
+        "sourceUrl": "https://www.skylark.co.jp/site_resource/common/js/brand/menu_202412.js?date=20260909",
+        "sourceTitle": "ガスト公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/gusto-menu.js",
+        "sha256": "9902f7e95e2535af9a09f3207dcb54d77de064901d98f24bdd6d1a4c781b5c83",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "ガスト",
+        "sourceUrl": "https://www.skylark.co.jp/gusto/menu/json/menu_detail.json",
+        "sourceTitle": "ガスト公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/gusto.json",
+        "sha256": "e2441fe8254ba50957f70a3b0a8e18849ff23ba11ddfbfec88fa1523e5f5d6bd",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "ガスト",
+        "sourceUrl": "https://www.skylark.co.jp/gusto/menu/json/index.json",
+        "sourceTitle": "ガスト公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/gusto-categories.json",
+        "sha256": "61f5d8d2adec602abbe56d391487b6c2781c6f77a61378da115937c05781cc45",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 1047857
+  },
+  {
+    "chain": "ジョイフル",
+    "restaurantId": "restaurant:ジョイフル",
+    "sourceUrl": "https://www.joyfull.co.jp/cal_pdf/cal.pdf",
+    "sourceTitle": "ジョイフル公式 メニュー・栄養情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-08",
+    "retrievedAt": "2026-09-09",
+    "transformationMethod": "scripts/restaurants/convert-stage3a3.py: joyfull",
+    "productCount": 300,
+    "variantCount": 345,
+    "blockedCount": 0,
+    "nutrientSourceCounts": {
+      "official": 1380,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 0
+    },
+    "notes": [
+      "実商品を収録。栄養値の不明はnullで保持。現掲載は全店舗での販売保証ではない。"
+    ],
+    "sourceFiles": [
+      {
+        "chain": "ジョイフル",
+        "sourceUrl": "https://www.joyfull.co.jp/cal_pdf/cal.pdf",
+        "sourceTitle": "ジョイフル公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/joyfull-reader-0.txt",
+        "sha256": "42563bc26b60306bb5a3893ce1007d412c091f87c158daffd94b1a5b37289350",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": [
+          "公開PDFの読取テキスト。ハッシュはPDFバイナリではなくテキストに対するもの。自動取得403を回避しない。"
+        ]
+      },
+      {
+        "chain": "ジョイフル",
+        "sourceUrl": "https://www.joyfull.co.jp/cal_pdf/cal.pdf",
+        "sourceTitle": "ジョイフル公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/joyfull-reader-1000.txt",
+        "sha256": "ac1447e88137e613556cc794c5f1b4188d668e3ad8ce5cdd9a721f4bc19b09a1",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": [
+          "公開PDFの読取テキスト。ハッシュはPDFバイナリではなくテキストに対するもの。自動取得403を回避しない。"
+        ]
+      },
+      {
+        "chain": "ジョイフル",
+        "sourceUrl": "https://www.joyfull.co.jp/cal_pdf/cal.pdf",
+        "sourceTitle": "ジョイフル公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/joyfull-reader-1200.txt",
+        "sha256": "7bf8f38747c44e9acb4a667c01454cb022e144b444621ea11169cd820ee28d46",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": [
+          "公開PDFの読取テキスト。ハッシュはPDFバイナリではなくテキストに対するもの。自動取得403を回避しない。"
+        ]
+      },
+      {
+        "chain": "ジョイフル",
+        "sourceUrl": "https://www.joyfull.co.jp/cal_pdf/cal.pdf",
+        "sourceTitle": "ジョイフル公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/joyfull-reader-1400.txt",
+        "sha256": "15839786979bc5eeb308f67813c49544343f55ad494b0ac994cf3baa466cd06d",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": [
+          "公開PDFの読取テキスト。ハッシュはPDFバイナリではなくテキストに対するもの。自動取得403を回避しない。"
+        ]
+      },
+      {
+        "chain": "ジョイフル",
+        "sourceUrl": "https://www.joyfull.co.jp/cal_pdf/cal.pdf",
+        "sourceTitle": "ジョイフル公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/joyfull-reader-200.txt",
+        "sha256": "97cc70af646e32973901546e34a12fef413ef346e1dff44548829ecc04b5bc6b",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": [
+          "公開PDFの読取テキスト。ハッシュはPDFバイナリではなくテキストに対するもの。自動取得403を回避しない。"
+        ]
+      },
+      {
+        "chain": "ジョイフル",
+        "sourceUrl": "https://www.joyfull.co.jp/cal_pdf/cal.pdf",
+        "sourceTitle": "ジョイフル公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/joyfull-reader-400.txt",
+        "sha256": "4343871694b1f7f47ec03beefc35898057f2df97a7eebaef484f869c0b3b8c9e",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": [
+          "公開PDFの読取テキスト。ハッシュはPDFバイナリではなくテキストに対するもの。自動取得403を回避しない。"
+        ]
+      },
+      {
+        "chain": "ジョイフル",
+        "sourceUrl": "https://www.joyfull.co.jp/cal_pdf/cal.pdf",
+        "sourceTitle": "ジョイフル公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/joyfull-reader-600.txt",
+        "sha256": "aa3fd5b6cda6c499b332f1a4efc63e2e17bc61996f7366c253391b5ce39ad8ce",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": [
+          "公開PDFの読取テキスト。ハッシュはPDFバイナリではなくテキストに対するもの。自動取得403を回避しない。"
+        ]
+      },
+      {
+        "chain": "ジョイフル",
+        "sourceUrl": "https://www.joyfull.co.jp/cal_pdf/cal.pdf",
+        "sourceTitle": "ジョイフル公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/joyfull-reader-800.txt",
+        "sha256": "96e1a41d76a1679f5beac3d6db5f4876bea36211991058e58a2e197ab6cdeb0b",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": [
+          "公開PDFの読取テキスト。ハッシュはPDFバイナリではなくテキストに対するもの。自動取得403を回避しない。"
+        ]
+      }
+    ],
+    "jsonBytes": 649088
+  },
+  {
+    "chain": "天下一品",
+    "restaurantId": "restaurant:天下一品",
+    "sourceUrl": "https://www.tenkaippin.co.jp/allergy_e/",
+    "sourceTitle": "天下一品公式 メニュー・栄養情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2025-08-01",
+    "retrievedAt": "2026-09-09",
+    "transformationMethod": "scripts/restaurants/convert-stage3a3.py: tenka",
+    "productCount": 17,
+    "variantCount": 34,
+    "blockedCount": 34,
+    "nutrientSourceCounts": {
+      "official": 0,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 136
+    },
+    "notes": [
+      "実商品を収録。栄養値の不明はnullで保持。現掲載は全店舗での販売保証ではない。"
+    ],
+    "sourceFiles": [
+      {
+        "chain": "天下一品",
+        "sourceUrl": "https://www.tenkaippin.co.jp/commitment/",
+        "sourceTitle": "天下一品公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2025-08-01",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/tenka-index.html",
+        "sha256": "3daf4a56cc2a6fea0ea296abfcaa0e026ec93f0d23dce084ebc705ef592c91cd",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "天下一品",
+        "sourceUrl": "https://www.tenkaippin.co.jp/allergy_e/",
+        "sourceTitle": "天下一品公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2025-08-01",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/tenka-east.html",
+        "sha256": "11267b48e71124241cbf8c4c362e14269b4f9df6ea513e73ac940299be9635a0",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "天下一品",
+        "sourceUrl": "https://www.tenkaippin.co.jp/allergy101/",
+        "sourceTitle": "天下一品公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2025-08-01",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/tenka-info.html",
+        "sha256": "5a0432293875d456997a7c21457cb65f26c5f81bee23734a307990deb5132fcd",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "天下一品",
+        "sourceUrl": "https://www.tenkaippin.co.jp/allergy_w/",
+        "sourceTitle": "天下一品公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2025-08-01",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/tenka-west.html",
+        "sha256": "1b8d22e655c451596b0b0df7b95279d763d749544213bd4bc2d7ab9f4d742094",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 96504
+  },
+  {
+    "chain": "餃子の王将",
+    "restaurantId": "restaurant:餃子の王将",
+    "sourceUrl": "https://www.ohsho.co.jp/menu/east/post.html",
+    "sourceTitle": "餃子の王将公式 メニュー・栄養情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": null,
+    "retrievedAt": "2026-09-09",
+    "transformationMethod": "scripts/restaurants/convert-stage3a3.py: ohsho",
+    "productCount": 70,
+    "variantCount": 266,
+    "blockedCount": 266,
+    "nutrientSourceCounts": {
+      "official": 0,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 1064
+    },
+    "notes": [
+      "実商品を収録。栄養値の不明はnullで保持。現掲載は全店舗での販売保証ではない。"
+    ],
+    "sourceFiles": [
+      {
+        "chain": "餃子の王将",
+        "sourceUrl": "https://www.ohsho.co.jp/menu/east/",
+        "sourceTitle": "餃子の王将公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/ohsho-east.html",
+        "sha256": "051d407891aa9dd8a19be9a597d362c27212ac917710107d9b09aa6047f7ca9b",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "餃子の王将",
+        "sourceUrl": "https://www.ohsho.co.jp/menu/west/",
+        "sourceTitle": "餃子の王将公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/ohsho-west.html",
+        "sha256": "82df2eff1ffc481985bb7278e9d9b0eace61890d8d51143e03bacb71d4b7ef56",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "餃子の王将",
+        "sourceUrl": "https://www.ohsho.co.jp/menu/south/",
+        "sourceTitle": "餃子の王将公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/ohsho-south.html",
+        "sha256": "96e3939939c04e3cfb747cd784cdf7314cc97563981a575da1aed792bb6ae6b7",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "餃子の王将",
+        "sourceUrl": "https://www.ohsho.co.jp/menu/east/post.html",
+        "sourceTitle": "餃子の王将公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/ohsho-detail.html",
+        "sha256": "d882994493c0db96c83982c3e495c0701f446b5c475b1dd205a9ac8529978bc7",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "餃子の王将",
+        "sourceUrl": "https://www.ohsho.co.jp/menu/west/post_374.html",
+        "sourceTitle": "餃子の王将公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/ohsho-west-detail.html",
+        "sha256": "3226e0be23c219a413ffb59a42b5e8ab6df933f708ba789889ed8ab6f5237563",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "餃子の王将",
+        "sourceUrl": "https://www.ohsho.co.jp/menu/south/post_412.html",
+        "sourceTitle": "餃子の王将公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/ohsho-south-detail.html",
+        "sha256": "03a31f7142b2b87284a65c67cfd274c7221be58dcf810c8df3369ddb8da96c83",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 747098
+  },
+  {
+    "chain": "スシロー",
+    "restaurantId": "restaurant:スシロー",
+    "sourceUrl": "https://www.akindo-sushiro.co.jp/menu/menu_detail/?s_id=869",
+    "sourceTitle": "スシロー公式 メニュー・栄養情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": null,
+    "retrievedAt": "2026-09-09",
+    "transformationMethod": "scripts/restaurants/convert-stage3a3.py: sushiro",
+    "productCount": 220,
+    "variantCount": 226,
+    "blockedCount": 226,
+    "nutrientSourceCounts": {
+      "official": 201,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 703
+    },
+    "notes": [
+      "実商品を収録。栄養値の不明はnullで保持。現掲載は全店舗での販売保証ではない。"
+    ],
+    "sourceFiles": [
+      {
+        "chain": "スシロー",
+        "sourceUrl": "https://www.akindo-sushiro.co.jp/menu/menu_detail/?s_id=869",
+        "sourceTitle": "スシロー公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/sushiro-normal.html",
+        "sha256": "ccdd5f3a9dc39c545ff0551fb9f99f472e8c793115ce0ef17e07baa195d353e0",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "スシロー",
+        "sourceUrl": "https://www.akindo-sushiro.co.jp/menu/menu_detail/?s_id=1019",
+        "sourceTitle": "スシロー公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/sushiro-detail.html",
+        "sha256": "347dad94ca587c46dce54a2d2a588155036b8a2f5673e1b8cee7e14c3b113692",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "スシロー",
+        "sourceUrl": "https://www.akindo-sushiro.co.jp/faq/",
+        "sourceTitle": "スシロー公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/sushiro-faq.html",
+        "sha256": "a3f0f30e5ca09fd167e78e98b9beebb6ad2c244ddcf149f28ac3dafe46e22e02",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "スシロー",
+        "sourceUrl": "https://www.akindo-sushiro.co.jp/menu/",
+        "sourceTitle": "スシロー公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/sushiro-index.html",
+        "sha256": "94e5aec94e9dbcb242489473d55315947f1008105935e0b99a132d023d1ed515",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "スシロー",
+        "sourceUrl": "https://www.akindo-sushiro.co.jp/menu/allergy.html",
+        "sourceTitle": "スシロー公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": null,
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/sushiro-allergy.html",
+        "sha256": "6139f356b595a9b0525c82884c193b21374ddbf1d841d63251e391d9aa1eb582",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 608042
+  },
+  {
+    "chain": "くら寿司",
+    "restaurantId": "restaurant:くら寿司",
+    "sourceUrl": "https://www.kurasushi.co.jp/common/pdf/kura_allergen.pdf?260904=",
+    "sourceTitle": "くら寿司公式 メニュー・栄養情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-04",
+    "retrievedAt": "2026-09-09",
+    "transformationMethod": "scripts/restaurants/convert-stage3a3.py: kura",
+    "productCount": 339,
+    "variantCount": 354,
+    "blockedCount": 354,
+    "nutrientSourceCounts": {
+      "official": 335,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 1081
+    },
+    "notes": [
+      "実商品を収録。栄養値の不明はnullで保持。現掲載は全店舗での販売保証ではない。"
+    ],
+    "sourceFiles": [
+      {
+        "chain": "くら寿司",
+        "sourceUrl": "https://www.kurasushi.co.jp/menu/?area=area0",
+        "sourceTitle": "くら寿司公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-04",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/kura-index.html",
+        "sha256": "256fb3e519c33b8dcfe207546bc0c5a2b98e1206a29ed2a0e6842c1e17c09934",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "くら寿司",
+        "sourceUrl": "https://www.kurasushi.co.jp/common/pdf/kura_allergen.pdf?260904=",
+        "sourceTitle": "くら寿司公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-04",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/kura.pdf",
+        "sha256": "400fdd52d4523a1c5a940698998c44583d4833e3f8e65ff0067778c83e358564",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 909854
+  },
+  {
+    "chain": "はま寿司",
+    "restaurantId": "restaurant:はま寿司",
+    "sourceUrl": "https://images.zensho.co.jp/materials/hama-sushi/allergen/allergen.pdf",
+    "sourceTitle": "はま寿司公式 メニュー・栄養情報",
+    "sourceType": "official",
+    "publishedOrUpdatedAt": "2026-09-08",
+    "retrievedAt": "2026-09-09",
+    "transformationMethod": "scripts/restaurants/convert-stage3a3.py: hama",
+    "productCount": 539,
+    "variantCount": 586,
+    "blockedCount": 586,
+    "nutrientSourceCounts": {
+      "official": 584,
+      "official_old": 0,
+      "secondary": 0,
+      "estimate": 0,
+      "unknown": 1760
+    },
+    "notes": [
+      "実商品を収録。栄養値の不明はnullで保持。現掲載は全店舗での販売保証ではない。"
+    ],
+    "sourceFiles": [
+      {
+        "chain": "はま寿司",
+        "sourceUrl": "https://www.hama-sushi.co.jp/menu/",
+        "sourceTitle": "はま寿司公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/hama-index.html",
+        "sha256": "ca7d51b2d94c0f4fb45df0aa321bec364c17846552d82e3f753cd26c8ee903df",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      },
+      {
+        "chain": "はま寿司",
+        "sourceUrl": "https://images.zensho.co.jp/materials/hama-sushi/allergen/allergen.pdf",
+        "sourceTitle": "はま寿司公式 メニュー・栄養情報",
+        "sourceType": "official",
+        "publishedOrUpdatedAt": "2026-09-08",
+        "retrievedAt": "2026-09-09",
+        "localRawFile": "stage3a3/hama.pdf",
+        "sha256": "d80d1b64f4da4c64e06eb0a7c3f84c42fa274d2e55b5a4254f2c70eadcd7e252",
+        "transformationMethod": "scripts/restaurants/convert-stage3a3.py",
+        "notes": []
+      }
+    ],
+    "jsonBytes": 1508640
   }
 ]
