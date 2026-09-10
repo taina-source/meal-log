@@ -1,3 +1,4 @@
+import { validateChatgptMeal } from '../domain/chatgpt';
 import { db } from './db';
 import { createId } from './id';
 import { defaultSettings, type MealEntry, type MealInput, type UserSettings } from '../domain/types';
@@ -16,11 +17,11 @@ export async function getDayMeals(date: string): Promise<MealEntry[]> {
   return db.meals.where('eatenAt').between(start, end, true, false).toArray();
 }
 export async function saveMeal(input: MealInput, existingId?: string): Promise<MealEntry> {
-  const error = validateMeal(input);
-  if (error) throw new Error(error);
   return db.transaction('rw', db.meals, async () => {
     const existing = existingId ? await db.meals.get(existingId) : undefined;
     if (existingId && !existing) throw new Error('この食事はすでに削除されています。');
+    const error = existing?.chatgptSnapshot ? validateChatgptMeal(input) : validateMeal(input);
+    if (error) throw new Error(error);
     const now = new Date().toISOString();
     const entry: MealEntry = { ...existing, ...input, name: input.name.trim(), eatenAt: new Date(input.eatenAt).toISOString(), id: existing?.id ?? createId(), restaurant: existing?.restaurant ?? '', sourceType: existing?.sourceType ?? 'manual', confidence: existing?.confidence ?? null, createdAt: existing?.createdAt ?? now, updatedAt: now };
     if (existing?.restaurantSnapshot && (['calories', 'protein', 'fat', 'carbs'] as const).some(key => existing[key] !== input[key])) {
@@ -28,6 +29,7 @@ export async function saveMeal(input: MealInput, existingId?: string): Promise<M
       // The immutable source snapshot remains available, but no longer describes the edited totals.
       entry.nutrientProvenance = undefined;
     }
+    if (existing?.chatgptSnapshot && (['name', 'calories', 'protein', 'fat', 'carbs'] as const).some(key => existing[key] !== input[key])) entry.chatgptUserModified = true;
     await db.meals.put(entry);
     return entry;
   });

@@ -11,12 +11,14 @@ export async function copyPreviousDay(targetDate: string, types: MealType[]): Pr
     let copied = 0, skipped = 0;
     const now = new Date().toISOString();
     const setRuns = new Map<string, string>();
+    const imports = new Map<string, string>();
     const orders = new Map<string, string>();
     for (const meal of source) {
       if (await db.meals.where('[copiedFromId+copyTargetDate]').equals([meal.id, targetDate]).count()) { skipped++; continue; }
       if (meal.setRunId && !setRuns.has(meal.setRunId)) setRuns.set(meal.setRunId, createId());
       if (meal.restaurantOrderId && !orders.has(meal.restaurantOrderId)) orders.set(meal.restaurantOrderId, createId());
-      await db.meals.add({ ...structuredClone(meal), id: createId(), eatenAt: new Date(`${targetDate}T${localTime(new Date(meal.eatenAt))}:00`).toISOString(), createdAt: now, updatedAt: now, copiedFromId: meal.id, copyTargetDate: targetDate, restaurantOrderId: meal.restaurantOrderId ? orders.get(meal.restaurantOrderId) : undefined, setRunId: meal.setRunId ? setRuns.get(meal.setRunId) : undefined });
+      if (meal.chatgptImportId && !imports.has(meal.chatgptImportId)) imports.set(meal.chatgptImportId, createId());
+      await db.meals.add({ ...structuredClone(meal), id: createId(), eatenAt: new Date(`${targetDate}T${localTime(new Date(meal.eatenAt))}:00`).toISOString(), createdAt: now, updatedAt: now, copiedFromId: meal.id, copyTargetDate: targetDate, chatgptImportId: meal.chatgptImportId ? imports.get(meal.chatgptImportId) : undefined, restaurantOrderId: meal.restaurantOrderId ? orders.get(meal.restaurantOrderId) : undefined, setRunId: meal.setRunId ? setRuns.get(meal.setRunId) : undefined });
       copied++;
     }
     return { copied, skipped };

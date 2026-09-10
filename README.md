@@ -1,4 +1,90 @@
-# Meal Log — 第3A-3段階
+# Meal Log — 第3B-1段階
+
+**ChatGPTアプリのテキスト版「Ask ChatGPT」→ Meal Logで確認・編集 → 食事登録**に対応しました。OpenAI API・APIキー・バックエンドは使いません。契約済みChatGPT PlusとiPhoneショートカットを利用し、Meal Log側の追加料金は0円です。アプリからChatGPTへ通信する処理はありません。
+
+## 第3B-1で追加した機能
+
+- 食事追加画面の「ChatGPTから取り込み」を有効化。手動JSON貼付と、ボタン操作時のみのクリップボード読取に対応。権限拒否・非対応でも長押しペーストから使えます。
+- `#ml-import=<URL_ENCODED_JSON>`による起動と、起動済みアプリのhash変更を検出。受信した内容を必ず確認画面に表示し、自動登録しません。
+- 商品名・店名・数量・単位・kcal/P/F/Cを編集。**1単位あたりの栄養値 × 数量**で合計し、食事区分・日時を選んで1〜20品を一括登録します。
+- 元のChatGPT情報はimmutable snapshotとして残し、ユーザー修正を表示。ホーム、日次合計、履歴へ即反映。履歴詳細から元値・出典・信頼度を確認できます。
+- null／欠落の栄養値は0にせず空欄として確認画面へ進め、補完するまで保存不可。負値、非有限値、数量0、不正なschema、過大な入力を拒否。大皿相当の大きな値や4/9/4との差は警告にとどめます。
+- 前日コピーでも栄養値とChatGPT snapshotを保持。コピー先では取り込みgroup IDを新しくし、既存の二重コピー防止を維持します。
+
+## JSON schema・旧形式
+
+```json
+{
+  "schemaVersion": 1,
+  "type": "meal-log-chatgpt",
+  "items": [{
+    "name": "料理名",
+    "restaurant": "",
+    "quantity": 1,
+    "unit": "人前",
+    "calories": null,
+    "protein": null,
+    "fat": null,
+    "carbs": null,
+    "sourceType": "estimate",
+    "sourceUrl": "",
+    "sourceTitle": "",
+    "confidence": "low",
+    "notes": "分量と栄養値を確認して補完してください"
+  }]
+}
+```
+
+上は数値を補完する前の形式例です。旧単品形式（`name`と栄養値等がルートにあるJSON）も読み込み、schemaVersion 1 / items 1件へ正規化します。省略時quantity=1、unit=個。複数品は各々MealEntryとして同じ`chatgptImportId`で保存します。商品をまとめた合計栄養値を渡す場合はquantity=1にし、二重乗算を避けてください。
+
+## ChatGPTの出典とDB
+
+`sourceType="official"`という回答も、Meal Logの検証済み公式DBとして扱いません。
+
+| ChatGPTの申告 | 表示 |
+| --- | --- |
+| official + 有効なHTTPS URL | ChatGPT経由・公式情報 |
+| official + URLなし／無効 | ChatGPT経由・公式情報（出典URLなし）＋確認の注意 |
+| estimate | ChatGPT推定 |
+| confidence | 高／中／低（ChatGPTの申告） |
+
+MealEntryは`sourceType="chatgpt"`、既存の数値confidenceはnull。元の文字列confidenceはsnapshotへ保存します。追加フィールドはすべてoptional：`chatgptSnapshot`（schemaVersion、元の商品・店・1単位の栄養値・quantity・unit・declaredSourceType・URL・資料名・confidence・notes・importedAt）、`chatgptImportId`、`chatgptUnit`、`chatgptUserModified`。MealEntry本体は編集後の名前・店・数量と数量反映後の栄養値を保持します。履歴で再編集しても元snapshotは変更しません。`restaurantSnapshot`／`restaurantOrderId`とは別です。
+
+**IndexedDB v3を維持**。table/index追加なし、既存v1/v2/v3定義を変更せず、既存データを消去する処理は追加していません。新しいお気に入りDBやChatGPT専用recentsは今回追加していません。
+
+## Fragment・privacy・オフライン
+
+URLは`https://taina-source.github.io/meal-log/#ml-import=...`。query parameterに食事JSONを入れません。fragmentはHTTPリクエストとしてGitHub Pagesへ送られません。ただし端末側の履歴等に一時的に残り得るため、解析前に`history.replaceState`で現在URLから削除します。不正JSON・過大fragmentも削除し、手動貼り付けへ誘導します。登録前はメモリー内だけに保持し、再読込で確認中の内容は失われます。Shortcuts／ChatGPT／端末全体の履歴を消す機能ではありません。[仕様の説明](https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Fragment)
+
+fragmentはエンコード後16KiB、手動JSONはUTF-8で128KiBまで。これはアプリの上限で、ブラウザーのURL限界を断定しません。大きなJSONはクリップボード・手動貼付へ。HTTPSのみ明示操作用リンクとし、危険なURLやHTMLを実行しません。
+
+PWAの`/meal-log/`、manifest、Service Worker、GitHub Actionsを維持。21外食JSONと食品DBを引き続きキャッシュし、受け取ったJSONの確認・編集・登録はオフラインで完結します。ChatGPTへの質問だけはオンラインです。公開後の更新を完了してからオフラインで使ってください。
+
+## 手順・検証
+
+- **[iPhoneショートカットの作り方と推奨ChatGPTプロンプト](docs/CHATGPT_SHORTCUT.md)**：入力を要求→テキスト→Ask ChatGPT→結果変数→JSONを1回URLエンコード→fragment URL→URLを開く。
+- **[第3B-1検証記録・実機チェックリスト](docs/STAGE3B1_VERIFICATION.md)**。
+- 自動テスト **257件成功（既存199 + 新規58）**、TypeScript、本番ビルド、PWA生成成功。
+- Chromeの隔離プロファイルで390×844／320×440、ライト／ダーク、clipboard fallback、fragment、オフライン終了→再起動と保存を確認。v1/v2/v3の記録保持、食品／レシピ／セット／コピー／体重／設定、外食KFC／CoCo壱／びっくりドンキー、21店検索も成功。console/page errorなし。
+- 21外食JSONと食品JSONは`stage3a-complete`とバイト一致。sources.jsonはGitの改行正規化を考慮して同一オブジェクト。外食JSON累計 **19,305,936 bytes**のまま。
+- PWA precacheは **37エントリー／32実ファイル、21,002,590 bytes（約20.03MiB）**。raw資料のprecache追加なし。
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm test
+pnpm run build
+```
+
+iPhoneでは公開後、普段のホーム画面PWAを更新し、まず手動貼付で確認・登録してください。その後ショートカットでURL起動→fragment消去→保存先が同じかを確認します。URLを開く操作がSafariへ進む場合もあり、PWAの直接起動は強制できません。保存先が別ならJSONをコピーして普段のPWAへ貼り付けます。詳細手順は上のdocsを参照してください。
+
+## 今回未実装
+
+写真・画像版Ask ChatGPTの自動受け取りは第3B-2以降。OpenAI API、バーコード、Open Food Facts、OCR、本格グラフ、自動分析、体重との関連分析、推定維持カロリー、食事提案、全データCSV/JSON Export・Import、クラウド同期、アカウント、バックエンドは追加していません。
+
+---
+
+# 第3A-3段階の記録
 
 **当初予定した21チェーンの外食実メニューDBが完成しました。** 実商品・公開栄養値・出典を収録したカタログです。未公表の栄養値は残っており、全商品のPFCが揃ったという意味ではありません。新7店舗のうちジョイフルは食事登録に対応し、ガスト・天下一品・餃子の王将・スシロー・くら寿司・はま寿司は今回、検索・詳細・出典確認・お気に入りまで利用できます。不足商品をカートへ追加・登録する操作は拒否します。
 

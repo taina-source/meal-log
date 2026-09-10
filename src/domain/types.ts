@@ -1,6 +1,6 @@
 export const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 export type MealType = typeof mealTypes[number];
-export type SourceType = 'manual' | 'official' | 'official_old' | 'secondary' | 'database' | 'estimate' | 'ai_estimate' | 'barcode' | 'recipe';
+export type SourceType = 'manual' | 'official' | 'official_old' | 'secondary' | 'database' | 'estimate' | 'ai_estimate' | 'barcode' | 'recipe' | 'chatgpt';
 export interface Nutrients { calories: number; protein: number; fat: number; carbs: number }
 export interface MealEntry extends Nutrients {
   id: string;
@@ -12,6 +12,10 @@ export interface MealEntry extends Nutrients {
   updatedAt: string;
   sourceType: SourceType;
   confidence: number | null;
+  chatgptSnapshot?: import('./chatgpt').ChatgptSnapshot;
+  chatgptImportId?: string;
+  chatgptUserModified?: boolean;
+  chatgptUnit?: string;
   sourceId?: string;
   sourceVersion?: string;
   quantity?: number;

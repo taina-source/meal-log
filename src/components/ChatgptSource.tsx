@@ -1,0 +1,8 @@
+import { chatgptSourceLabel, confidenceLabels, nutrientKeys, nutrientLabels, safeSourceUrl, type ChatgptItem, type ChatgptSnapshot } from '../domain/chatgpt';
+export function ChatgptSource({ item }: { item: Pick<ChatgptItem, 'sourceType' | 'sourceUrl' | 'sourceTitle' | 'confidence' | 'notes'> }) {
+  const url = safeSourceUrl(item.sourceUrl);
+  return <div className="chatgpt-source"><p>出典：{chatgptSourceLabel(item)}</p><p>信頼度：{confidenceLabels[item.confidence]}（ChatGPTの申告）</p><p className="help">Meal Logが検証した公式DBの値ではありません。</p>{url ? <a href={url} target="_blank" rel="noopener noreferrer">{item.sourceTitle || '出典を開く'}（外部サイト）</a> : <>{item.sourceTitle && <p>{item.sourceTitle}</p>}{item.sourceUrl && <p className="help">リンク無効：{item.sourceUrl}</p>}</>}{item.notes && <p className="help">{item.notes}</p>}</div>;
+}
+export function ChatgptOriginal({ snapshot, modified }: { snapshot: ChatgptSnapshot; modified?: boolean }) {
+  return <section className="form-stack"><h3>ChatGPT取り込み情報</h3>{modified && <p className="catalog-note">ユーザー修正あり。以下は変更前のChatGPT情報です。</p>}<ChatgptSource item={{ ...snapshot, sourceType: snapshot.declaredSourceType }} /><details className="catalog-details"><summary>元入力情報（登録時のスナップショット）</summary><p>{snapshot.restaurant} {snapshot.name}</p><p>数量：{snapshot.quantity} {snapshot.unit}</p><p>1単位あたり</p>{nutrientKeys.map(key => <p key={key}>{nutrientLabels[key]}：{snapshot[key] === null ? '不明' : `${snapshot[key]} ${key === 'calories' ? 'kcal' : 'g'}`}</p>)}<p>取込日時：{new Date(snapshot.importedAt).toLocaleString('ja-JP')}</p><p>schemaVersion：{snapshot.schemaVersion}</p></details></section>;
+}
