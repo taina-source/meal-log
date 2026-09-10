@@ -1,5 +1,6 @@
 import { mealTypes, type MealInput, type Nutrients } from './types';
 import { validateMeal } from './validation';
+import { parseJsonWithSmartQuotes } from './jsonQuotes';
 
 export const nutrientKeys = ['calories', 'protein', 'fat', 'carbs'] as const;
 export const nutrientLabels = { calories: 'カロリー', protein: 'P たんぱく質', fat: 'F 脂質', carbs: 'C 炭水化物' };
@@ -47,7 +48,7 @@ export function normalizeChatgptItem(value: unknown): ChatgptItem {
 }
 export function parseChatgptJson(text: string): ChatgptPayload {
   if (text.length > pasteLimit || new TextEncoder().encode(text).length > pasteLimit) throw new Error('JSONが長すぎます。128KiB以内・20商品以内に分けてください。');
-  const value = record(JSON.parse(text));
+  const value = record(parseJsonWithSmartQuotes(text));
   const inputType = validateInputType(value.inputType);
   // An envelope with an unknown version/type must never fall back to legacy parsing.
   const envelope = 'schemaVersion' in value || 'type' in value || 'items' in value;

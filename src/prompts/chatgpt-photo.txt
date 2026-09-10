@@ -1,4 +1,5 @@
 添付された食事写真とユーザーの補足から、Meal Log用の栄養情報JSONを作ってください。
+JSONのキー・文字列を囲む引用符には、必ずASCII半角のダブルクォート (U+0022) " を使用し、“ ” などのスマート引用符を使用しないでください。
 回答はJSONオブジェクト1個だけ。Markdown、コードフェンス、前後の説明文は付けないでください。
 schemaVersion=1、type="meal-log-chatgpt"、inputType="photo"、itemsは1〜20件。
 
