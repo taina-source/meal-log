@@ -9,9 +9,10 @@ export interface ChatgptItem {
   sourceType: 'official' | 'estimate'; sourceUrl: string; sourceTitle: string;
   confidence: 'high' | 'medium' | 'low'; notes: string;
 }
-export interface ChatgptPayload { schemaVersion: 1; type: 'meal-log-chatgpt'; items: ChatgptItem[] }
+export type ChatgptInputType = 'text' | 'photo';
+export interface ChatgptPayload { schemaVersion: 1; type: 'meal-log-chatgpt'; inputType?: ChatgptInputType; items: ChatgptItem[] }
 export interface ChatgptSnapshot extends Omit<ChatgptItem, 'sourceType'> {
-  schemaVersion: 1; declaredSourceType: ChatgptItem['sourceType']; importedAt: string;
+  schemaVersion: 1; declaredSourceType: ChatgptItem['sourceType']; importedAt: string; inputType?: ChatgptInputType;
 }
 export interface ImportReceipt { payload?: ChatgptPayload; error?: string; importedAt: string }
 export const pasteLimit = 128 * 1024;
@@ -24,6 +25,7 @@ function record(value: unknown): Record<string, unknown> {
 function textField(row: Record<string, unknown>, key: string, max: number, fallback = ''): string {
   const value = row[key] === undefined ? fallback : row[key];
   if (typeof value !== 'string' || value.length > max) throw new Error(`${key}は${max}文字以内の文字列にしてください。`);
+  if (/data:image\//i.test(value)) throw new Error('画像データは取り込めません。栄養情報JSONだけを貼り付けてください。');
   return value.trim();
 }
 function numberField(value: unknown, key: string): number | null {
@@ -46,12 +48,17 @@ export function normalizeChatgptItem(value: unknown): ChatgptItem {
 export function parseChatgptJson(text: string): ChatgptPayload {
   if (text.length > pasteLimit || new TextEncoder().encode(text).length > pasteLimit) throw new Error('JSONが長すぎます。128KiB以内・20商品以内に分けてください。');
   const value = record(JSON.parse(text));
+  const inputType = validateInputType(value.inputType);
   // An envelope with an unknown version/type must never fall back to legacy parsing.
   const envelope = 'schemaVersion' in value || 'type' in value || 'items' in value;
   if (envelope && (value.schemaVersion !== 1 || value.type !== 'meal-log-chatgpt')) throw new Error('対応していないschemaVersionまたはtypeです。');
   const items = envelope ? value.items : [value];
   if (!Array.isArray(items) || items.length < 1 || items.length > 20) throw new Error('itemsは1〜20件にしてください。');
-  return { schemaVersion: 1, type: 'meal-log-chatgpt', items: items.map(normalizeChatgptItem) };
+  return { schemaVersion: 1, type: 'meal-log-chatgpt', ...(inputType ? { inputType } : {}), items: items.map(normalizeChatgptItem) };
+}
+export function validateInputType(value: unknown): ChatgptInputType | undefined {
+  if (value === undefined || value === 'text' || value === 'photo') return value;
+  throw new Error('inputTypeはtextまたはphotoにしてください。');
 }
 export function readChatgptJson(text: string): ImportReceipt {
   const importedAt = new Date().toISOString();
@@ -72,8 +79,8 @@ export function consumeImportFragment(target: Pick<Window, 'location' | 'history
 export function safeSourceUrl(value: string): string | null {
   try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : null; } catch { return null; }
 }
-export function chatgptSourceLabel(item: Pick<ChatgptItem, 'sourceType' | 'sourceUrl'>): string {
-  return item.sourceType === 'estimate' ? 'ChatGPT推定' : `ChatGPT経由・公式情報${safeSourceUrl(item.sourceUrl) ? '' : '（出典URLなし）'}`;
+export function chatgptSourceLabel(item: Pick<ChatgptItem, 'sourceType' | 'sourceUrl'>, inputType?: ChatgptInputType): string {
+  return item.sourceType === 'estimate' ? inputType === 'photo' ? 'ChatGPT写真推定' : 'ChatGPT推定' : `ChatGPT経由・公式情報${safeSourceUrl(item.sourceUrl) ? '' : '（出典URLなし）'}`;
 }
 export const confidenceLabels = { high: '高', medium: '中', low: '低' };
 export function chatgptTotals(items: ChatgptItem[]): Nutrients {

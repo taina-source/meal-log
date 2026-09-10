@@ -1,4 +1,64 @@
-# Meal Log — 第3B-1段階
+# Meal Log — 第3B-2段階
+
+**食事写真をChatGPTアプリで解析 → JSONをコピー → 普段のホーム画面Meal Logで確認・編集・登録**に対応しました。写真はMeal Logに渡さず、画像解析・画像保存・OpenAI API・APIキー・バックエンドを追加していません。契約済みChatGPTアプリを使い、Meal Log側の追加料金は0円です。
+
+## 正式なiPhone運用
+
+- **テキスト**：ショートカットの「入力を要求」→ プロンプト → テキスト版Ask ChatGPT → 回答JSONをクリップボードへコピー → 普段のホーム画面Meal Log → ＋ → **ChatGPTから取り込み**。
+- **写真**：ChatGPTアプリへ写真を添付 → 写真用プロンプトと量の補足を送信 → 回答JSONをコピー → 普段のホーム画面Meal Log → ＋ → **写真からChatGPT取り込み**。
+
+いずれも読込後に内容確認・編集・食事区分／日時選択を経て登録します。自動登録やMeal LogからChatGPTへの通信はありません。
+
+**第3B-1の実機結果**：テキストJSONの生成・コピー・PWAでの読込・登録・Home/History反映は正常でした。一方、fragment URLはSafariを開き、ホーム画面PWAと履歴／IndexedDBが共有されませんでした。「Appを開く」でもPWAのMeal Logを選べませんでした。したがって、このiPhoneではクリップボード方式を正式運用とします。fragment機能はPC等の**互換／実験的ルート**として維持しますが、PWA起動の推奨ルートにはしません。
+
+## 第3B-2の追加機能と仕様
+
+| 項目 | 内容 |
+| --- | --- |
+| 写真入口 | 写真解析の手順、プロンプトコピー、clipboard読込、手動JSON貼付。書込・読取が拒否されても手動コピー／貼付可能 |
+| 共通処理 | 第3B-1のparser、編集、数量計算、登録、snapshot、Home、History、前日コピーを再利用 |
+| JSON | schemaVersion=1、type=meal-log-chatgptのまま。任意inputType="photo"を追加。省略／textはテキスト・旧形式、未知値は拒否 |
+| 数量 | 原則、数量1・単位「写真の1皿分」・その皿全体の栄養値。個数が確実な場合のみ1個あたり×個数。アプリは数量を1回掛ける |
+| 注意表示 | 写真の量・油・調味料・隠れた材料を正確には判断できないことを確認画面に表示 |
+| 出典 | 写真estimateは「ChatGPT写真推定」、テキストestimateは従来の「ChatGPT推定」。officialの申告は「ChatGPT経由・公式情報」で、検証済み公式DBと区別 |
+| confidence・notes | 「推定信頼度：高／中／低（ChatGPTの申告）」「推定時のメモ」として表示 |
+| 修正 | 元snapshotを保持。chatgptUserModifiedに加え任意chatgptModifiedBeforeSaveで登録前の修正を区別 |
+| null | 0へ補完せず、数値入力が揃うまで登録禁止。従来の負値・非有限値・巨大入力・1〜20items制限も維持 |
+| 写真の保存 | 画像入力／送信／保存処理なし。許可した項目だけを正規化・保存し、未知の画像/base64/blobフィールドは採用しない。既知の文字列欄の画像data URLは拒否 |
+| DB | **IndexedDB v3維持**。chatgptSnapshot.inputTypeとMealEntryの任意フラグ追加だけで、table/index/既存migrationの変更なし |
+
+写真JSONは既存テキスト入口でも写真と判定します。写真入口でもinputType未指定の旧JSONを勝手に写真扱いにせず、テキスト形式の注意を出します。写真の結果なら写真用プロンプトでJSONを出し直してください。
+
+## プロンプトと操作ガイド
+
+- **[写真の実際の手順・プロンプト全文・ショートカット案](docs/CHATGPT_PHOTO.md)**
+- **[テキスト版ショートカットの手順](docs/CHATGPT_SHORTCUT.md)**（iPhoneはclipboard方式に更新）
+- **[第3B-2検証記録と実機チェックリスト](docs/STAGE3B2_VERIFICATION.md)**
+
+写真プロンプトの原本は[`src/prompts/chatgpt-photo.txt`](src/prompts/chatgpt-photo.txt)。アプリが直接取り込み、docsのプロンプト全文は`node scripts/sync-photo-prompt.cjs`で更新します。自動テストで一致を確認します。ユーザーの量・食べた割合の補足を最優先し、隠れた材料の断定・二重計上・不自然な精密値を避ける内容です。プロンプト上の丸めは写真の推定値への指示だけで、アプリは既存公式値を丸め直しません。
+
+写真をChatGPTで解析する部分は手動操作とオンライン接続が必要です。取得済みJSONの貼付・確認・編集・登録・履歴はオフラインで利用できます。ChatGPTを開く独自URLスキームや画像Share機能は追加していません。
+
+## 検証・保守
+
+既存257件＋写真用33件の **290件成功**。型チェック・本番ビルド・PWA生成成功。precacheは**37エントリー／32実ファイル、21,011,898 bytes（約20.038MiB）**。390×844／320×440・ライト／ダーク・オフライン再起動、テキスト版回帰、v1/v2/v3データ保持に成功。詳しくは[検証記録](docs/STAGE3B2_VERIFICATION.md)を参照してください。21外食JSON、MEXT JSON、`/meal-log/`、Service Worker設定、GitHub Actionsを維持します。
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm test
+pnpm run build
+```
+
+## 今回含まないもの
+
+OpenAI API、完全自動画像Shortcut連携、独自AI画像モデル、栄養表示専用OCR、バーコード、Open Food Facts、本格グラフ、自動分析、摂取カロリーと体重の関連分析、推定維持カロリー、残りPFC食事提案、全データExport/Import、同期、アカウント、バックエンドは未実装です。
+
+---
+
+以下は第3B-1以前の開発記録です。**iPhoneの現行運用は上記のクリップボード方式**を使用してください。
+
+# 第3B-1段階の記録
 
 **ChatGPTアプリのテキスト版「Ask ChatGPT」→ Meal Logで確認・編集 → 食事登録**に対応しました。OpenAI API・APIキー・バックエンドは使いません。契約済みChatGPT PlusとiPhoneショートカットを利用し、Meal Log側の追加料金は0円です。アプリからChatGPTへ通信する処理はありません。
 

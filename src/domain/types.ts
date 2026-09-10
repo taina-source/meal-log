@@ -15,6 +15,7 @@ export interface MealEntry extends Nutrients {
   chatgptSnapshot?: import('./chatgpt').ChatgptSnapshot;
   chatgptImportId?: string;
   chatgptUserModified?: boolean;
+  chatgptModifiedBeforeSave?: boolean;
   chatgptUnit?: string;
   sourceId?: string;
   sourceVersion?: string;

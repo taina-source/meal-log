@@ -2,6 +2,12 @@
 
 実施日：2026-09-10。ブラウザーは隔離したChromeプロファイルによるiPhone相当表示です。ユーザーの実機Safariや本番IndexedDBを開いたり、削除したりしていません。
 
+## 公開後のiPhone実機結果（ユーザー確認済み）
+
+テキスト版Ask ChatGPT→JSON生成・コピー→普段のホーム画面Meal Log→クリップボード読込→確認→登録→Home/Historyは正常でした。fragment URLはSafariを開き、ホーム画面PWAとIndexedDB／履歴が共有されませんでした。「Appを開く」でPWAのMeal Logも選択できませんでした。
+
+したがってiPhoneの正式運用は**クリップボード方式**です。URL fragmentはPC等の互換／実験的ルートとして保持し、この実機でのPWA起動には推奨しません。`stage3b1-complete`時点の機能・データを保持して第3B-2へ進みます。以下の開発時検証は当時の記録です。
+
 ## 実行結果
 
 | 検証 | 結果 |
@@ -46,7 +52,7 @@ node scripts/browser-stage3a3.cjs
 
 専用プロファイル、JSONレポート、スクリーンショットはGit対象外の`test-results/`へ出力します。食品・外食DB監査は`python scripts/restaurants/audit-stage3a3.py`です。
 
-## 実機で残る確認
+## 公開前に用意した実機チェックリスト（記録）
 
 本変更はGitHubへpushしていません。新しいiOS Safariでの実機検証、Ask ChatGPT実行、ショートカットのOSアクション接続は利用者による公開後確認が必要です。
 
