@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import Dexie from 'dexie';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db, MealLogDatabase } from './db';
 import { duplicateRecipe, quickEntry, registerItems, removeFavorite, saveFavorite, saveRecipe, saveSet } from './catalogRepository';
 import { copyPreviousDay } from './copyMeals';
@@ -23,7 +23,24 @@ describe('第2段階の保存・スナップショット', () => {
   it('セットに不正値がある場合は一部だけ登録しない', async () => { await expect(registerItems([foodItem(rice,100,'1'), { ...foodItem(egg,100,'2'), nutrients: { calories: -1, protein:0,fat:0,carbs:0 } }],context)).rejects.toThrow(); expect(await db.meals.count()).toBe(0); });
   it('かんたん入力の空名・PFC0を保存する', async () => { const meal = await quickEntry(850,' ',context); expect(meal).toMatchObject({ name:'かんたん入力',calories:850,protein:0,fat:0,carbs:0,sourceType:'manual' }); });
   it('かんたん入力の異常値を拒否する', async () => { await expect(quickEntry(-1,'',context)).rejects.toThrow(); await expect(quickEntry(NaN,'',context)).rejects.toThrow(); });
-  it('最近使った食品・レシピ・セットを履歴から導出する', async () => { const set = await saveSet('セット', [foodItem(rice,200,'1'),foodItem(egg,100,'2')]); await registerItems(set.items,context,set); await registerItems([foodItem(rice,100,'3')],context); await registerItems([foodItem(rice,200,'4')],context); const recent = recentItems(await db.meals.toArray()); expect(recent.find(item => item.kind === 'set')?.count).toBe(1); expect(recent.find(item => item.kind === 'food')?.count).toBe(2); expect(recent.find(item => item.kind === 'food')?.quantity).toBe(200); });
+  it('最近使った食品・レシピ・セットを履歴から導出する', async () => {
+    // Distinct registration times are part of this test's chronology, not elapsed CPU time.
+    // Equal millisecond timestamps otherwise leave the result dependent on random ID order.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      vi.setSystemTime(new Date('2026-09-06T01:00:00Z'));
+      const set = await saveSet('セット', [foodItem(rice,200,'1'),foodItem(egg,100,'2')]);
+      await registerItems(set.items,context,set);
+      vi.setSystemTime(new Date('2026-09-06T01:00:01Z'));
+      await registerItems([foodItem(rice,100,'3')],context);
+      vi.setSystemTime(new Date('2026-09-06T01:00:02Z'));
+      await registerItems([foodItem(rice,200,'4')],context);
+      const recent = recentItems(await db.meals.toArray());
+      expect(recent.find(item => item.kind === 'set')?.count).toBe(1);
+      expect(recent.find(item => item.kind === 'food')?.count).toBe(2);
+      expect(recent.find(item => item.kind === 'food')?.quantity).toBe(200);
+    } finally { vi.useRealTimers(); }
+  });
   it('再接続後にレシピ・お気に入り・セットと記録が残る', async () => { const recipe = await saveRecipe(sampleRecipe()); await saveFavorite('recipe',recipe.id,.5); await saveSet('セット',[foodItem(rice,100,'1')]); await registerItems([recipeItem(recipe,.5,'2')],context); db.close(); await db.open(); expect(await db.recipes.count()).toBe(1); expect(await db.favorites.count()).toBe(1); expect(await db.mealSets.count()).toBe(1); expect(await db.meals.count()).toBe(1); });
   it('従来の編集でも新しい出典情報を失わない', async () => { const [entry] = await registerItems([foodItem(rice,100,'1')],context); await saveMeal({ ...entry, name:'編集',calories:170 },entry.id); expect(await db.meals.get(entry.id)).toMatchObject({ name:'編集',calories:170,sourceId:rice.id,quantity:100,sourceType:'database' }); });
 });

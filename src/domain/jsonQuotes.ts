@@ -1,4 +1,5 @@
-/** Repair only paired U+201C/U+201D string delimiters in otherwise strict JSON.
+/** Repair smart string delimiters only at positions required by strict JSON grammar.
+ * U+201D may open a key/value token too (iOS copies empty strings as ””).
  * ASCII strings (including their smart punctuation) and all escapes stay verbatim.
  * Balanced smart quotes nested in smart-delimited text remain literal punctuation.
  * Unmatched quotes, mixed delimiter pairs, comments, and trailing commas are rejected.
@@ -10,7 +11,7 @@ function normalizeSmartDelimiters(text: string): string {
   const whitespace = () => { while (/[\x20\t\r\n]/.test(text[position] ?? '') && position < text.length) position++; };
   function string() {
     const start = position, opening = text[position++];
-    if (opening !== '"' && opening !== '“') fail();
+    if (opening !== '"' && opening !== '“' && opening !== '”') fail();
     let nested = 0;
     while (position < text.length) {
       const index = position++, char = text[index];
@@ -28,7 +29,7 @@ function normalizeSmartDelimiters(text: string): string {
     if (depth > 64) fail(); // Bound fallback stack usage; never guess at deeply nested input.
     whitespace();
     const char = text[position];
-    if (char === '"' || char === '“') { string(); return; }
+    if (char === '"' || char === '“' || char === '”') { string(); return; }
     if (char === '{' || char === '[') {
       const object = char === '{', closing = object ? '}' : ']';
       position++; whitespace();
