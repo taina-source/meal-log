@@ -1,0 +1,34 @@
+.analysis-page { display: grid; gap: 16px; }
+.analysis-page .page-heading { margin-bottom: 0; }
+.analysis-periods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--soft); border-radius: 14px; }
+.analysis-periods button { min-height: 44px; padding: 8px 2px; border-radius: 10px; font-weight: 600; }
+.analysis-periods button[aria-pressed=true] { background: var(--card); box-shadow: 0 1px 4px #0001; color: var(--accent-strong); }
+.analysis-block { display: grid; gap: 14px; padding: 18px; min-width: 0; }
+.analysis-note { color: var(--muted); font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.analysis-number { font-size: 34px; font-weight: 650; line-height: 1.2; overflow-wrap: anywhere; }
+.analysis-number span { font-size: 15px; font-weight: 400; }
+.analysis-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.analysis-metrics > div { display: grid; gap: 5px; align-content: start; overflow-wrap: anywhere; font-size: 14px; }
+.analysis-metrics small { font-size: 11px; line-height: 1.6; color: var(--muted); }
+.analysis-pfc { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.analysis-pfc > div { display: grid; gap: 7px; overflow-wrap: anywhere; }
+.analysis-pfc span { font-size: 11px; line-height: 1.5; }
+.analysis-pfc b { font-size: 18px; }
+.analysis-empty { padding: 16px 0; color: var(--muted); font-size: 14px; line-height: 1.8; }
+.analysis-chart { margin: 0; min-width: 0; }
+.analysis-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.analysis-chart text { fill: var(--muted); font-size: 11px; }
+.analysis-chart figcaption { font-size: 11px; line-height: 1.8; color: var(--muted); }
+.chart-grid { stroke: var(--line); }
+.chart-target { stroke: var(--muted); stroke-dasharray: 6 4; }
+.chart-measured { stroke: var(--accent-strong); fill: var(--accent-strong); }
+.chart-average { stroke: var(--danger); fill: var(--danger); }
+.analysis-block details { min-width: 0; }
+.analysis-block summary { min-height: 44px; padding: 12px 0; cursor: pointer; font-size: 13px; }
+.analysis-block summary:focus-visible { outline: 3px solid var(--accent); }
+.analysis-block table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+.analysis-block caption { text-align: left; color: var(--muted); padding: 8px 0; font-size: 11px; }
+.analysis-block th, .analysis-block td { padding: 10px 2px; text-align: right; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.analysis-block th:first-child { text-align: left; }
+.analysis-block td small { display: block; color: var(--muted); }
+@media (max-width: 350px) { .analysis-block { padding: 14px; } .analysis-pfc { gap: 5px; } }
