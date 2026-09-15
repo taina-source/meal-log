@@ -43,6 +43,9 @@ export interface UserSettings {
   targetWeight: number | null;
   theme: 'system' | 'light' | 'dark';
   showPfcDecimals: boolean;
+  analysisExcludeLowCalories?: boolean;
+  analysisMinimumCalories?: number;
+  quickPfcPercentages?: { protein: number; fat: number; carbs: number };
 }
 export interface WeightEntry { id: string; date: string; weight: number; createdAt: string }
 export type MealInput = Pick<MealEntry, 'name' | 'mealType' | 'eatenAt' | keyof Nutrients>;

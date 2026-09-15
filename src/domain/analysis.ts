@@ -36,14 +36,21 @@ export function dailyMeals(meals: MealEntry[]): MealDay[] {
   }
   return [...days.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
-export function mealSummary(days: MealDay[], range: DateRange) {
+export function analysisPolicy(settings: Pick<UserSettings, 'analysisExcludeLowCalories' | 'analysisMinimumCalories'> = {}) {
+  return { enabled: settings.analysisExcludeLowCalories ?? true, threshold: settings.analysisMinimumCalories ?? 1500 };
+}
+export function isAnalysisDay(day: Pick<MealDay, 'calories'>, policy = analysisPolicy()): boolean {
+  return !policy.enabled || day.calories > policy.threshold;
+}
+export function mealSummary(days: MealDay[], range: DateRange, policy = analysisPolicy()) {
   const records = days.filter(day => within(day.date, range));
-  const total = sumNutrients(records);
-  const average: Nutrients | null = records.length ? {
-    calories: total.calories / records.length, protein: total.protein / records.length,
-    fat: total.fat / records.length, carbs: total.carbs / records.length,
+  const eligible = records.filter(day => isAnalysisDay(day, policy));
+  const total = sumNutrients(eligible);
+  const average: Nutrients | null = eligible.length ? {
+    calories: total.calories / eligible.length, protein: total.protein / eligible.length,
+    fat: total.fat / eligible.length, carbs: total.carbs / eligible.length,
   } : null;
-  return { records, recordedDays: records.length, average };
+  return { records, recordedDays: records.length, eligibleDays: eligible.length, excludedDays: records.length - eligible.length, average };
 }
 export function targetDifference(average: Nutrients | null, settings: UserSettings): Nutrients | null {
   if (!average) return null;
@@ -74,11 +81,11 @@ export function weightSummary(days: WeightDay[], range: DateRange) {
   const first = records[0] ?? null, latest = records.at(-1) ?? null;
   return { records, first, latest, change: records.length >= 2 ? latest!.weight - first!.weight : null };
 }
-export function recentTrends(days: MealDay[], weights: WeightDay[], today: string) {
+export function recentTrends(days: MealDay[], weights: WeightDay[], today: string, policy = analysisPolicy()) {
   const currentRange = analysisRange(7, today, []);
   const previousRange = dateRange(shiftDate(today, -13), shiftDate(today, -7));
-  const current = mealSummary(days, currentRange), previous = mealSummary(days, previousRange);
-  const enough = current.recordedDays >= 4 && previous.recordedDays >= 4;
+  const current = mealSummary(days, currentRange, policy), previous = mealSummary(days, previousRange, policy);
+  const enough = current.eligibleDays >= 4 && previous.eligibleDays >= 4;
   const difference: Nutrients | null = enough && current.average && previous.average ? {
     calories: current.average.calories - previous.average.calories,
     protein: current.average.protein - previous.average.protein,

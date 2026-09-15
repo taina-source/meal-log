@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { calendarDay, type DateRange } from '../domain/analysis';
 import { formatNumber } from '../domain/nutrition';
 
-export interface ChartPoint { date: string; value: number }
+export interface ChartPoint { date: string; value: number; excluded?: boolean }
 interface Series { name: string; points: ChartPoint[]; dashed?: boolean }
 export function AnalysisChart({ title, range, series, target, unit, zero = false }: {
   title: string; range: DateRange; series: Series[]; target?: number; unit: string; zero?: boolean;
@@ -30,7 +30,7 @@ export function AnalysisChart({ title, range, series, target, unit, zero = false
         const path = line.points.map((point, i) => `${i && calendarDay(point.date) - calendarDay(line.points[i - 1].date) === 1 ? 'L' : 'M'}${x(point.date)},${y(point.value)}`).join(' ');
         return <g key={line.name} className={line.dashed ? 'chart-average' : 'chart-measured'}>
           <path d={path} fill="none" strokeWidth="2" strokeDasharray={line.dashed ? '5 4' : undefined} />
-          {line.points.map(point => line.dashed ? <rect key={point.date} x={x(point.date) - 2} y={y(point.value) - 2} width="4" height="4"><title>{point.date} {line.name} {formatNumber(point.value, true)}{unit}</title></rect> : <circle key={point.date} cx={x(point.date)} cy={y(point.value)} r="2.5"><title>{point.date} {line.name} {formatNumber(point.value, true)}{unit}</title></circle>)}
+          {line.points.map(point => line.dashed ? <rect key={point.date} x={x(point.date) - 2} y={y(point.value) - 2} width="4" height="4"><title>{point.date} {line.name} {formatNumber(point.value, true)}{unit}</title></rect> : <circle key={point.date} cx={x(point.date)} cy={y(point.value)} r="2.5" style={point.excluded ? { fill: 'var(--card)' } : undefined}><title>{point.excluded ? '平均対象外：' : ''}{point.date} {line.name} {formatNumber(point.value, true)}{unit}</title></circle>)}
         </g>;
       })}
       <text x={left} y="180" textAnchor="start">{label(range.start)}</text>

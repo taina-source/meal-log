@@ -20,6 +20,15 @@ export function validLocalDateTime(date: string, time: string): boolean {
   return Number.isFinite(parsed.getTime()) && localDate(parsed) === date && parsed.getFullYear() >= 1900 && parsed.getFullYear() <= 2100;
 }
 export function validateSettings(settings: UserSettings): string | undefined {
+  if (settings.analysisExcludeLowCalories !== undefined && typeof settings.analysisExcludeLowCalories !== 'boolean') return '分析除外設定が正しくありません。';
+  if (settings.analysisMinimumCalories !== undefined) {
+    const error = numericError(settings.analysisMinimumCalories, '分析対象最低カロリー', 20000);
+    if (error) return error;
+  }
+  if (settings.quickPfcPercentages !== undefined) for (const key of ['protein', 'fat', 'carbs'] as const) {
+    const error = numericError(settings.quickPfcPercentages[key], `${key}割合`, 100);
+    if (error) return error;
+  }
   for (const [value, label, max, min] of [[settings.calorieTarget, '目標カロリー', 20000, 1], [settings.proteinTarget, 'P目標', 2000, 0], [settings.fatTarget, 'F目標', 2000, 0], [settings.carbsTarget, 'C目標', 2000, 0]] as const) {
     const error = numericError(value, label, max, min);
     if (error) return error;

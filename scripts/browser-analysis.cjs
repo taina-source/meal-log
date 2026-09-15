@@ -19,7 +19,7 @@ async function seed(mode) {
       }
     }
     if (['both','weight','one'].includes(mode)) for(const [i,value] of mode==='one'?[[0,80]]:[[0,80],[2,81],[6,82],[8,84]]) weights.push({id:`weight-${i}`,date:date(i),weight:value,createdAt:new Date().toISOString()});
-    await new Promise((resolve,reject)=>{const r=indexedDB.open('meal-log');r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,tx=db.transaction(['meals','weights','settings'],'readwrite');for(const name of ['meals','weights'])tx.objectStore(name).clear();for(const row of meals)tx.objectStore('meals').put(row);for(const row of weights)tx.objectStore('weights').put(row);tx.objectStore('settings').put({id:'user',calorieTarget:2000,proteinTarget:160,fatTarget:70,carbsTarget:260,targetWeight:null,theme:'system',showPfcDecimals:true});tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};});
+    await new Promise((resolve,reject)=>{const r=indexedDB.open('meal-log');r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,tx=db.transaction(['meals','weights','settings'],'readwrite');for(const name of ['meals','weights'])tx.objectStore(name).clear();for(const row of meals)tx.objectStore('meals').put(row);for(const row of weights)tx.objectStore('weights').put(row);tx.objectStore('settings').put({id:'user',calorieTarget:2000,proteinTarget:160,fatTarget:70,carbsTarget:260,targetWeight:null,theme:'system',showPfcDecimals:true,analysisExcludeLowCalories:false});tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};});
   }, mode);
   await page.reload(); await open();
 }
@@ -31,7 +31,7 @@ async function run() {
   await overflow();await page.screenshot({path:path.join(out,'analysis-empty-390.png')});checks.push('empty state');
   await seed('both');
   const overview=page.getByRole('region',{name:'摂取カロリー概要',exact:true});
-  await overview.getByText('記録日 4 / 7日',{exact:true}).waitFor();
+  await overview.getByText('記録日 4 / 7日 · 分析対象 4日',{exact:true}).waitFor();
   assert.ok((await overview.innerText()).includes('1,500'));assert.ok((await overview.innerText()).includes('-500'));
   await page.getByRole('region',{name:'体重概要'}).getByText('-2 kg',{exact:true}).waitFor();
   await page.getByRole('region',{name:'体重概要'}).getByText('81 kg',{exact:true}).waitFor();
@@ -50,8 +50,8 @@ async function run() {
   }
   await seed('one');await page.getByText('比較するには2日以上の記録が必要です').waitFor();
   await seed('meal');await page.getByText('この期間の体重は未記録です。ホームから体重を記録できます。').waitFor();
-  await seed('weight');await overview.getByText('記録日 0 / 7日',{exact:true}).waitFor();
-  await page.getByText('記録が少ないため傾向判定なし（各期間4日以上が必要です）。').waitFor();
+  await seed('weight');await overview.getByText('記録日 0 / 7日 · 分析対象 0日',{exact:true}).waitFor();
+  await page.getByText('分析対象日が少ないため傾向判定なし（各期間4日以上が必要です）。').waitFor();
   checks.push(`${process.env.DEVELOPMENT_CHECK ? '390' : '390/320'} light/dark and scrolling; single weight, meals only, weights only, sparse trends`);
   assert.deepEqual(errors,[]);const report={result:'PASS',checks,errors};fs.writeFileSync(path.join(out,'analysis-browser-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));await context.close();
 }

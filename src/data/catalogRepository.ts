@@ -4,7 +4,8 @@ import type { Favorite, FavoriteKind, MealSet, MealSetItem, Recipe } from '../do
 import type { MealEntry, MealType, Nutrients } from '../domain/types';
 import { positive, recipeTotal, setTotal } from '../domain/foods';
 import { validateMeal, validLocalDateTime } from '../domain/validation';
-import { saveMeal } from './repository';
+import { getSettings, saveMeal, saveSettings } from './repository';
+import { quickNutrition, type PfcValues, type QuickPfc } from '../domain/quickNutrition';
 export type RecipeDraft = Pick<Recipe, 'name' | 'ingredients' | 'servings'>;
 function validName(name: string): string {
   if (!name.trim() || name.trim().length > 100) throw new Error('名前は1〜100文字で入力してください。');
@@ -66,7 +67,17 @@ export async function registerItems(items: MealSetItem[], context: MealContext, 
   await db.transaction('rw', db.meals, async () => { await db.meals.bulkAdd(entries); });
   return entries;
 }
-export async function quickEntry(calories: number, name: string, context: MealContext) {
+export async function saveQuickPercentages(values: PfcValues) {
+  await db.transaction('rw', db.settings, async () => {
+    await saveSettings({ ...await getSettings(), quickPfcPercentages: { ...values } });
+  });
+}
+export async function quickEntry(calories: number, name: string, context: MealContext, pfc: QuickPfc = { mode: 'none' }) {
   if (!validLocalDateTime(context.date, context.time)) throw new Error('日付・時刻を正しく入力してください。');
-  return saveMeal({ name: name.trim() || 'かんたん入力', calories, protein: 0, fat: 0, carbs: 0, mealType: context.mealType, eatenAt: new Date(`${context.date}T${context.time}:00`).toISOString() });
+  const { nutrients } = quickNutrition(calories, pfc);
+  return db.transaction('rw', db.meals, db.settings, async () => {
+    const meal = await saveMeal({ name: name.trim() || 'かんたん入力', ...nutrients, mealType: context.mealType, eatenAt: new Date(`${context.date}T${context.time}:00`).toISOString() });
+    if (pfc.mode === 'percent') await saveQuickPercentages(pfc.values);
+    return meal;
+  });
 }

@@ -7,6 +7,7 @@ function meal(date: string, calories = 500): MealEntry {
   return { id: `${date}-${calories}`, name: 'テスト', restaurant: '', mealType: 'lunch', eatenAt: new Date(`${date}T12:00:00`).toISOString(), createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z', sourceType: 'manual', confidence: null, calories, protein: calories / 10, fat: calories / 20, carbs: calories / 5 };
 }
 const weight = (date: string, value: number, createdAt = `${date}T00:00:00Z`): WeightEntry => ({ id: `${date}-${value}`, date, weight: value, createdAt });
+const off = { enabled: false, threshold: 1500 };
 const today = '2026-03-02';
 describe('分析の暦日・食事集計', () => {
   it.each([7, 30, 90] as const)('%i日は今日と開始日を含み、前日・明日を含まない', period => {
@@ -22,7 +23,7 @@ describe('分析の暦日・食事集計', () => {
   it('複数食事を日別合算し未記録日を除いた平均・現在目標との差を計算する', () => {
     const entries = [meal(today, 500), meal(today, 700), meal(shiftDate(today, -2), 600)];
     const snapshot = structuredClone(entries);
-    const summary = mealSummary(dailyMeals(entries), analysisRange(7, today, []));
+    const summary = mealSummary(dailyMeals(entries), analysisRange(7, today, []), off);
     expect(summary.recordedDays).toBe(2);
     expect(summary.records.at(-1)).toMatchObject({ calories: 1200, count: 2 });
     expect(summary.average).toEqual({ calories: 900, protein: 90, fat: 45, carbs: 180 });
@@ -32,9 +33,9 @@ describe('分析の暦日・食事集計', () => {
   });
   it('食事0件は平均なし、記録された0kcalは実際の記録日', () => {
     const range = analysisRange(7, today, []);
-    expect(mealSummary([], range)).toEqual({ records: [], recordedDays: 0, average: null });
+    expect(mealSummary([], range)).toEqual({ records: [], recordedDays: 0, eligibleDays: 0, excludedDays: 0, average: null });
     expect(targetDifference(null, defaultSettings)).toBeNull();
-    expect(mealSummary(dailyMeals([meal(today, 0)]), range).average?.calories).toBe(0);
+    expect(mealSummary(dailyMeals([meal(today, 0)]), range, off).average?.calories).toBe(0);
   });
   it('ローカル深夜の前後を異なる日に振り分け、UTCの日付切取りを使わない', () => {
     const midnight = new Date(2026, 2, 2, 0, 0, 0);
@@ -81,13 +82,13 @@ describe('体重と移動平均', () => {
 describe('直近7日とその前7日', () => {
   const days = (n: number, offset: number, kcal: number) => Array.from({ length: n }, (_, i) => meal(shiftDate(today, -i - offset), kcal));
   it('両期間4日以上の記録だけで差分を表示する', () => {
-    const trend = recentTrends(dailyMeals([...days(4, 0, 1000), ...days(4, 7, 800), meal(shiftDate(today, -14), 9999)]), [], today);
+    const trend = recentTrends(dailyMeals([...days(4, 0, 1000), ...days(4, 7, 800), meal(shiftDate(today, -14), 9999)]), [], today, off);
     expect(trend.current.recordedDays).toBe(4); expect(trend.previous.recordedDays).toBe(4);
     expect(trend.difference).toEqual({ calories: 200, protein: 20, fat: 10, carbs: 40 });
     expect(trend.previousRange.end).toBe(shiftDate(today, -7));
   });
   it.each([[3, 4], [4, 3], [0, 0]])('記録日が少ない場合は判定なし（%i / %i）', (a, b) => {
-    const trend = recentTrends(dailyMeals([...days(a, 0, 1000), ...days(b, 7, 800)]), [], today);
+    const trend = recentTrends(dailyMeals([...days(a, 0, 1000), ...days(b, 7, 800)]), [], today, off);
     expect(trend.difference).toBeNull();
   });
 });
