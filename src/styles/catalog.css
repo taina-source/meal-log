@@ -72,3 +72,6 @@
 .restaurant-cart-bar > div { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 .restaurant-cart-bar .button { padding: 12px; font-size: 13px; flex-shrink: 0; }
 .restaurant-order-heading { background: var(--soft); padding: 12px 16px; font-size: 13px; line-height: 1.6; }
+
+.favorite-categories { display: flex; overflow-x: auto; max-width: 100%; padding-bottom: 6px; }
+.favorite-categories button { flex: 0 0 auto; min-width: 80px; min-height: 44px; }

@@ -10,8 +10,8 @@ export interface Food {
 export interface FoodDataset { metadata: { name: string; version: string; sourceUrl: string; sourcePage: string; retrievedAt: string; foodCount: number }; foods: Food[] }
 export interface RecipeIngredient { id: string; foodId: string; name: string; grams: number; per100g: Nutrients; sourceVersion: string; notes: string[] }
 export interface Recipe { id: string; name: string; ingredients: RecipeIngredient[]; servings: number; createdAt: string; updatedAt: string }
-export type FavoriteKind = 'food' | 'recipe' | 'set' | 'restaurant' | 'restaurantMenu';
-export interface Favorite { id: string; kind: FavoriteKind; sourceId: string; quantity: number; createdAt: string }
+export type FavoriteKind = 'food' | 'recipe' | 'set' | 'restaurant' | 'restaurantMenu' | 'chatgptMeal' | 'manualMeal';
+export interface Favorite { id: string; kind: FavoriteKind; sourceId: string; quantity: number; createdAt: string; mealSnapshot?: import('./types').MealEntry }
 export interface MealSetItem { id: string; kind: 'food' | 'recipe' | 'restaurant'; sourceId: string; name: string; quantity: number; unit: 'g' | 'whole'; nutrients: Nutrients; sourceVersion?: string; notes?: string[]; recipeSnapshot?: Recipe }
 export interface MealSet { id: string; name: string; items: MealSetItem[]; total: Nutrients; createdAt: string; updatedAt: string }
 export interface RecentItem { kind: FavoriteKind; sourceId: string; name: string; quantity: number; lastUsedAt: string; count: number; score: number; item?: MealSetItem; setSnapshot?: MealSet }
