@@ -5,7 +5,7 @@ import { saveMeasurement } from './measurements';
 import { beginHealthExport, finishHealthExport } from './healthExport';
 import { getSettings, saveSettings, saveWeight } from './repository';
 import { measurementDraft, measurementFields, measurementSeries, measurementSummary, measurementValues, validateMeasurements, type MeasurementValues } from '../domain/measurements';
-import { healthBatch, healthCounts, healthMeasurements, healthRange, isHealthShared, pendingHealthExport } from '../domain/healthExport';
+import { supportedHealthBatch, healthBatch, healthCounts, healthMeasurements, healthRange, isHealthShared, pendingHealthExport } from '../domain/healthExport';
 import { analysisRange, dailyWeights, mealSummary, weightSummary } from '../domain/analysis';
 import type { WeightEntry } from '../domain/types';
 const date = '2026-09-15', stamp = '2026-09-15T03:00:00.000Z';
@@ -50,9 +50,9 @@ it('低カロリー除外は身体測定に影響せず既存7日体重平均を
 });
 it('項目単位で未共有を抽出、全共有済みは除外・値変更で再対象', () => {
   const entry = { ...row(date, { weightKg: 100, bodyFatPercent: 24, waistCm: 98 }), healthExport: { weightKg: { value: 100, exportedAt: stamp }, bodyFatPercent: { value: 24, exportedAt: stamp } } };
-  expect(healthMeasurements([entry])).toEqual([{ date, waistCm: 98 }]);
+  expect(healthMeasurements([entry])).toEqual([]);
   expect(healthMeasurements([{ ...entry, waistCm: undefined }])).toEqual([]);
-  expect(healthMeasurements([{ ...entry, weightKg: 99.8 }])).toEqual([{ date, weightKg: 99.8, waistCm: 98 }]);
+  expect(healthMeasurements([{ ...entry, weightKg: 99.8 }])).toEqual([{ date, weightKg: 99.8 }]);
 });
 it.each([['today', [date]], ['7', ['2026-09-09', date]], ['30', ['2026-08-17', '2026-09-09', date]], ['all', ['2026-08-01', '2026-08-17', '2026-09-09', date]]] as const)('%sのローカル暦日境界を含め昇順に抽出', (scope, expected) => {
   const rows = [date, '2026-09-09', '2026-08-17', '2026-08-01'].map(d => row(d));
@@ -64,8 +64,8 @@ it('任意期間の両端を含め不正期間を拒否', () => {
 });
 it('単日でもbatch JSON、数値だけで日数・項目数を数え不要情報を含めない', () => {
   const payload = healthBatch([row(date, { waistCm: 98, weightKg: 100 })], 'fixed');
-  expect(JSON.parse(JSON.stringify(payload))).toEqual({ schemaVersion: 1, type: 'meal-log-health-batch', exportId: 'fixed', measurements: [{ date, weightKg: 100, waistCm: 98 }] });
-  expect(healthCounts(payload.measurements)).toEqual({ days: 1, fields: 2 }); expect(healthCounts([])).toEqual({ days: 0, fields: 0 });
+  expect(JSON.parse(JSON.stringify(payload))).toEqual({ schemaVersion: 1, type: 'meal-log-health-batch', exportId: 'fixed', measurements: [{ date, weightKg: 100 }] });
+  expect(healthCounts(payload.measurements)).toEqual({ days: 1, fields: 1 }); expect(healthCounts([])).toEqual({ days: 0, fields: 0 });
 });
 it('再共有は期間内の現在値だけを対象としmissingは補完しない', () => {
   const entry = { ...row(), healthExport: { weightKg: { value: 100, exportedAt: stamp } } };
@@ -96,7 +96,7 @@ it('明示confirmだけが項目metadataを更新しpendingを消す', async () 
 it('pending後の編集はsnapshot値でconfirmし現在値を未共有のまま残す', async () => {
   const saved = await saveMeasurement(date, { weightKg: 100 }); const p = await beginHealthExport();
   await saveMeasurement(date, { weightKg: 99.8, waistCm: 98 }); await finishHealthExport(p.payload.exportId, true);
-  const next = (await db.weights.get(saved.id))!; expect(next.healthExport?.weightKg?.value).toBe(100); expect(healthMeasurements([next])).toEqual([{ date, weightKg: 99.8, waistCm: 98 }]);
+  const next = (await db.weights.get(saved.id))!; expect(next.healthExport?.weightKg?.value).toBe(100); expect(healthMeasurements([next])).toEqual([{ date, weightKg: 99.8 }]);
 });
 it('cancelはmetadata不変、次のexportIdは新規、古い確認は拒否', async () => {
   const saved = await saveMeasurement(date, { weightKg: 100 }); const p = await beginHealthExport(); await finishHealthExport(p.payload.exportId, false);
@@ -109,3 +109,43 @@ it('pending元record削除後confirmはskip、同日再作成にも誤適用し�
   expect((await db.weights.get(replacement.id))?.healthExport).toBeUndefined(); expect((await getSettings()).pendingHealthExport).toBeUndefined();
 });
 it('0件ではpendingを作成しない', async () => { await expect(beginHealthExport()).rejects.toThrow('未共有'); expect((await getSettings()).pendingHealthExport).toBeUndefined(); });
+
+it('ウエストだけの日は未共有も再共有も0件でpendingを作らない', async () => {
+  const saved = await saveMeasurement(date, { waistCm: 98 });
+  for (const resend of [false, true]) {
+    expect(healthCounts(healthMeasurements([saved], undefined, resend))).toEqual({ days: 0, fields: 0 });
+    await expect(beginHealthExport(undefined, resend)).rejects.toThrow('未共有');
+  }
+  expect(await db.weights.get(saved.id)).toEqual(saved);
+});
+it('新pending・再共有にウエストを入れず、ウエスト編集で未共有は増えない', async () => {
+  const saved = await saveMeasurement(date, { weightKg: 100, bodyFatPercent: 24, waistCm: 98 });
+  const p = await beginHealthExport(); expect(p.payload.measurements).toEqual([{ date, weightKg: 100, bodyFatPercent: 24 }]);
+  await finishHealthExport(p.payload.exportId, true);
+  await saveMeasurement(date, { weightKg: 100, bodyFatPercent: 24, waistCm: 97 });
+  const entry = (await db.weights.get(saved.id))!;
+  expect(entry.healthExport?.waistCm).toBeUndefined(); expect(healthMeasurements([entry])).toEqual([]);
+  expect(healthBatch([entry], 'resend', undefined, true).measurements).toEqual([{ date, weightKg: 100, bodyFatPercent: 24 }]);
+});
+it('旧pendingのウエストを再試行payloadから除き旧metadataを更新・削除しない', async () => {
+  const entry = { ...row(date, { weightKg: 100, waistCm: 98 }), healthExport: { waistCm: { value: 96, exportedAt: stamp } } };
+  await db.weights.add(entry);
+  const p = pendingHealthExport([entry], 'legacy', stamp);
+  const legacy = { ...p, payload: { ...p.payload, measurements: [{ date, weightKg: 100, waistCm: 98 }, { date: '2026-09-16', waistCm: 99 }] } };
+  await db.settings.put({ ...await getSettings(), id: 'user', pendingHealthExport: legacy });
+  const before = structuredClone(legacy);
+  expect(supportedHealthBatch(legacy.payload).measurements).toEqual([{ date, weightKg: 100 }]);
+  expect(healthCounts(legacy.payload.measurements)).toEqual({ days: 1, fields: 1 }); expect(legacy).toEqual(before);
+  expect(isHealthShared(entry, 'waistCm')).toBe(false);
+  await finishHealthExport('legacy', true);
+  const saved = (await db.weights.get(entry.id))!;
+  expect(saved.healthExport?.waistCm).toEqual(entry.healthExport.waistCm); expect(saved.healthExport?.weightKg?.value).toBe(100); expect(saved.waistCm).toBe(98);
+});
+it('ウエストだけの旧pendingは送信0件・完了してもmetadataを作らない', async () => {
+  const entry = await saveMeasurement(date, { waistCm: 98 });
+  const p = pendingHealthExport([entry], 'legacy-waist', stamp);
+  p.payload.measurements = [{ date, waistCm: 98 } as typeof p.payload.measurements[number]];
+  expect(supportedHealthBatch(p.payload).measurements).toEqual([]);
+  await db.settings.put({ ...await getSettings(), id: 'user', pendingHealthExport: p });
+  await finishHealthExport(p.payload.exportId, true); expect(await db.weights.get(entry.id)).toEqual(entry);
+});

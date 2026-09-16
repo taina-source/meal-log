@@ -1,9 +1,10 @@
 import { shiftDate } from './date';
 import { validLocalDateTime } from './validation';
-import { dailyMeasurements, measurementFields, measurementValues, validateMeasurements, type MeasurementField, type MeasurementValues } from './measurements';
+import { dailyMeasurements, measurementValues, validateMeasurements, type MeasurementField, type MeasurementValues } from './measurements';
 import type { WeightEntry } from './types';
 export type HealthScope = 'all' | 'today' | '7' | '30' | 'custom';
-export interface HealthMeasurement extends MeasurementValues { date: string }
+export const healthFields = ['weightKg', 'bodyFatPercent'] as const;
+export interface HealthMeasurement extends Pick<MeasurementValues, typeof healthFields[number]> { date: string }
 export interface HealthBatch { schemaVersion: 1; type: 'meal-log-health-batch'; exportId: string; measurements: HealthMeasurement[] }
 export interface PendingHealthExport { payload: HealthBatch; createdAt: string; mode: 'unshared' | 'all'; recordIds: Record<string, string> }
 export const healthShortcutUrl = 'shortcuts://run-shortcut?name=Meal%20Log%20Health';
@@ -14,6 +15,7 @@ export function healthRange(scope: HealthScope, today: string, start = today, en
   return range;
 }
 export function isHealthShared(entry: WeightEntry, field: MeasurementField) {
+  if (field === 'waistCm') return false;
   const value = measurementValues(entry)[field];
   return value !== undefined && entry.healthExport?.[field]?.value === value;
 }
@@ -22,14 +24,14 @@ export function healthMeasurements(entries: WeightEntry[], range?: { start: stri
     if (range && (entry.date < range.start || entry.date > range.end)) return [];
     const values = measurementValues(entry);
     const row: HealthMeasurement = { date: entry.date };
-    for (const field of measurementFields) if (values[field] !== undefined && (resend || !isHealthShared(entry, field))) row[field] = values[field];
+    for (const field of healthFields) if (values[field] !== undefined && (resend || !isHealthShared(entry, field))) row[field] = values[field];
     if (Object.keys(row).length === 1) return [];
     const error = validateMeasurements(row);
     if (error || !validLocalDateTime(row.date, '12:00')) throw new Error(error ?? '身体測定の日付を確認してください。');
     return [row];
   });
 }
-export function healthCounts(rows: HealthMeasurement[]) { return { days: rows.length, fields: rows.reduce((n, row) => n + measurementFields.filter(key => row[key] !== undefined).length, 0) }; }
+export function healthCounts(rows: HealthMeasurement[]) { return { days: rows.filter(row => healthFields.some(field => row[field] !== undefined)).length, fields: rows.reduce((n, row) => n + healthFields.filter(key => row[key] !== undefined).length, 0) }; }
 // exportId/time are supplied by the persistence boundary to keep these functions pure.
 export function healthBatch(entries: WeightEntry[], exportId: string, range?: { start: string; end: string }, resend = false): HealthBatch {
   return { schemaVersion: 1, type: 'meal-log-health-batch', exportId, measurements: healthMeasurements(entries, range, resend) };
@@ -40,6 +42,17 @@ export function pendingHealthExport(entries: WeightEntry[], exportId: string, cr
 }
 export function confirmedHealthMetadata(entry: WeightEntry, row: HealthMeasurement, exportedAt: string): WeightEntry['healthExport'] {
   const metadata = { ...entry.healthExport };
-  for (const field of measurementFields) if (row[field] !== undefined) metadata[field] = { value: row[field], exportedAt };
+  for (const field of healthFields) if (row[field] !== undefined) metadata[field] = { value: row[field], exportedAt };
   return metadata;
+}
+
+// Read-time projection also protects retries of pending exports saved by older versions.
+// Stored legacy data is not migrated or rewritten.
+export function supportedHealthBatch(batch: HealthBatch): HealthBatch {
+  return { schemaVersion: 1, type: 'meal-log-health-batch', exportId: batch.exportId,
+    measurements: batch.measurements.flatMap(row => {
+      const result: HealthMeasurement = { date: row.date };
+      for (const field of healthFields) if (row[field] !== undefined) result[field] = row[field];
+      return healthFields.some(field => result[field] !== undefined) ? [result] : [];
+    }) };
 }
