@@ -1,3 +1,4 @@
+import { MaintenanceCard } from '../components/MaintenanceCard';
 import { MeasurementAnalysis } from '../components/MeasurementAnalysis';
 import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -40,7 +41,7 @@ export function Analysis({ settings }: { settings: UserSettings }) {
     <p className="analysis-note">{shortDate(range.start)} — {shortDate(range.end)}{period === 'all' && '（保存データの最初〜最後）'}</p>
     {!data ? <p role="status">記録を読み込み中…</p> : data.error ? <p role="alert">記録を読み込めませんでした。画面を開き直してください。</p> : <>
       {!meals.recordedDays && !(data.weights.some(row => row.date >= range.start && row.date <= range.end)) && <p className="analysis-empty" role="status">まだ分析できる記録がありません。ホームで食事や身体測定を記録してください。</p>}
-      <section className="card analysis-block" aria-label="摂取カロリー概要"><h2>摂取カロリー概要</h2>
+      <MaintenanceCard meals={mealDays} weights={weightDays} policy={policy} /><section className="card analysis-block" aria-label="摂取カロリー概要"><h2>摂取カロリー概要</h2>
         <p className="analysis-note">記録日 {meals.recordedDays} / {range.days}日 · 分析対象 {meals.eligibleDays}日</p><p className="analysis-note">現在の分析設定：{policy.enabled ? `${formatNumber(policy.threshold)} kcal以下を除外` : '除外OFF'}</p>{meals.excludedDays > 0 && <p className="analysis-note">{formatNumber(policy.threshold)} kcal以下の{meals.excludedDays}日を平均から除外</p>}{meals.recordedDays > 0 && meals.eligibleDays === 0 && <p className="analysis-note">分析対象日がありません。設定または食事記録をご確認ください。</p>}
         <p>平均摂取カロリー</p><p className="analysis-number">{meals.average ? formatNumber(meals.average.calories) : '—'} <span>kcal</span></p>
         <div className="analysis-metrics"><div><span>現在の目標</span><b>{formatNumber(settings.calorieTarget)} kcal</b></div><div><span>平均 − 現在目標</span><b>{difference ? `${signed(difference.calories)} kcal` : '—'}</b></div></div>
