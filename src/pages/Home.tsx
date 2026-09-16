@@ -1,14 +1,13 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../data/db';
+import { MeasurementHome } from '../components/MeasurementHome';
 import { getDayMeals } from '../data/repository';
 import { mealLabels, mealTypes, type MealType, type UserSettings } from '../domain/types';
 import { formatDate, localDate, shiftDate } from '../domain/date';
 import { formatNumber, remainingLabel, sumNutrients } from '../domain/nutrition';
 import { Icon } from '../components/Icon';
 import { PfcCards, Progress } from '../components/Nutrition';
-export function Home({ date, setDate, settings, onAdd, onHistory, onWeight, onCopy, onComingSoon }: { date: string; setDate: (date: string) => void; settings: UserSettings; onAdd: (type?: MealType) => void; onHistory: (type: MealType) => void; onWeight: (weight?: number) => void; onCopy: () => void; onComingSoon: () => void }) {
+export function Home({ date, setDate, settings, onAdd, onHistory, onWeight, onHealth, onCopy, onComingSoon }: { date: string; setDate: (date: string) => void; settings: UserSettings; onAdd: (type?: MealType) => void; onHistory: (type: MealType) => void; onWeight: () => void; onHealth: () => void; onCopy: () => void; onComingSoon: () => void }) {
   const meals = useLiveQuery(() => getDayMeals(date), [date]);
-  const weight = useLiveQuery(() => db.weights.where('date').equals(date).first(), [date]);
   const totals = sumNutrients(meals ?? []);
   const remaining = settings.calorieTarget - totals.calories;
   const today = date === localDate();
@@ -22,7 +21,7 @@ export function Home({ date, setDate, settings, onAdd, onHistory, onWeight, onCo
       return <button className="meal-row" key={type} onClick={() => items.length ? onHistory(type) : onAdd(type)} aria-label={`${mealLabels[type]}${items.length ? 'の記録を見る' : 'を追加'}`}><span className={`meal-icon ${type}`}><Icon name={type} /></span><span className="meal-copy"><span className="meal-title"><strong>{mealLabels[type]}</strong>{items.length > 0 && <span>{formatNumber(sumNutrients(items).calories)} <small>kcal</small></span>}</span><span className="meal-summary">{items.length ? items.map(meal => meal.name).join('、') : 'まだ登録されていません'}</span></span><Icon name={items.length ? 'chevron-right' : 'plus'} size={18} /></button>;
     })}</div></section>
     <section className="remaining-card"><div className="remaining-heading"><span className="soft-icon"><Icon name="leaf" size={20} /></span><h2>{today ? '今日の残り' : 'この日の残り'}</h2><span className="small-badge">PFC</span></div><p className="remaining-calories">{formatNumber(Math.abs(remaining))}<span> kcal{remaining < 0 ? ' オーバー' : ''}</span></p><p className="remaining-macros">{(['P', 'F', 'C'] as const).map((label, index) => <span key={label}>{label} {remainingLabel([totals.protein, totals.fat, totals.carbs][index], [settings.proteinTarget, settings.fatTarget, settings.carbsTarget][index], 'g', settings.showPfcDecimals).replace(/^あと/, '')}</span>)}</p><button className="suggestion-button" onClick={onComingSoon}><span>残りPFCから食事を提案</span><span className="coming-tag">近日追加</span><Icon name="chevron-right" size={16} /></button></section>
-    <section className="card weight-card"><span className="soft-icon neutral"><Icon name="scale" /></span><div><h2>{today ? '今日の体重' : 'この日の体重'}</h2><p>{weight ? <><strong>{formatNumber(weight.weight, true)}</strong><span> kg</span></> : <span className="muted">未記録</span>}</p></div><button className="button small secondary" onClick={() => onWeight(weight?.weight)}>記録</button></section>
+    <MeasurementHome date={date} onRecord={onWeight} onHealth={onHealth} />
     <p className="footer-note">毎日の記録を、あなたのペースで。</p>
   </>;
 }

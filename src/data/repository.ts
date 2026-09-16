@@ -10,7 +10,12 @@ export async function getSettings(): Promise<UserSettings> {
 export async function saveSettings(settings: UserSettings): Promise<void> {
   const error = validateSettings(settings);
   if (error) throw new Error(error);
-  await db.settings.put({ ...settings, id: 'user' });
+  await db.transaction('rw', db.settings, async () => {
+    const current = await db.settings.get('user');
+    // Pending export is owned by the export transaction, never a stale settings form.
+    const next = { ...settings, id: 'user', pendingHealthExport: current?.pendingHealthExport };
+    await db.settings.put(next);
+  });
 }
 export async function getDayMeals(date: string): Promise<MealEntry[]> {
   const [start, end] = dayBounds(date);
@@ -41,7 +46,7 @@ export async function saveWeight(date: string, weight: number): Promise<void> {
   if (!validLocalDateTime(date, '12:00')) throw new Error('日付が正しくありません。');
   await db.transaction('rw', db.weights, async () => {
     const existing = await db.weights.where('date').equals(date).first();
-    await db.weights.put({ id: existing?.id ?? createId(), date, weight, createdAt: existing?.createdAt ?? new Date().toISOString() });
+    await db.weights.put({ ...existing, ...(existing?.weightKg !== undefined ? { weightKg: weight } : {}), id: existing?.id ?? createId(), date, weight, createdAt: existing?.createdAt ?? new Date().toISOString() });
   });
 }
 export function storageError(error: unknown): string {

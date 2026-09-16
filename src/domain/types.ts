@@ -46,8 +46,17 @@ export interface UserSettings {
   analysisExcludeLowCalories?: boolean;
   analysisMinimumCalories?: number;
   quickPfcPercentages?: { protein: number; fat: number; carbs: number };
+  pendingHealthExport?: import('./healthExport').PendingHealthExport;
 }
-export interface WeightEntry { id: string; date: string; weight: number; createdAt: string }
+export interface WeightEntry {
+  id: string; date: string; createdAt: string;
+  /** Legacy weight records remain readable without rewriting stored rows. */
+  weight?: number;
+  weightKg?: number;
+  bodyFatPercent?: number;
+  waistCm?: number;
+  healthExport?: Partial<Record<import('./measurements').MeasurementField, { value: number; exportedAt: string }>>;
+}
 export type MealInput = Pick<MealEntry, 'name' | 'mealType' | 'eatenAt' | keyof Nutrients>;
 export const mealLabels: Record<MealType, string> = { breakfast: '朝食', lunch: '昼食', dinner: '夕食', snack: '間食' };
 export const defaultSettings: UserSettings = { calorieTarget: 2400, proteinTarget: 180, fatTarget: 70, carbsTarget: 260, targetWeight: null, theme: 'system', showPfcDecimals: true };

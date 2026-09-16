@@ -1,3 +1,4 @@
+import { MeasurementAnalysis } from '../components/MeasurementAnalysis';
 import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../data/db';
@@ -22,7 +23,7 @@ export function Analysis({ settings }: { settings: UserSettings }) {
   }, []);
   const mealDays = useMemo(() => dailyMeals(data?.meals ?? []), [data]);
   const weightDays = useMemo(() => dailyWeights(data?.weights ?? []), [data]);
-  const range = analysisRange(period, today, [...mealDays, ...weightDays].map(day => day.date));
+  const range = analysisRange(period, today, [...mealDays, ...(data?.weights ?? [])].map(day => day.date));
   const policy = analysisPolicy(settings);
   const meals = mealSummary(mealDays, range, policy), weight = weightSummary(weightDays, range);
   const difference = targetDifference(meals.average, settings);
@@ -34,11 +35,11 @@ export function Analysis({ settings }: { settings: UserSettings }) {
     { key: 'carbs' as const, label: 'C', target: settings.carbsTarget },
   ];
   return <div className="analysis-page">
-    <div className="page-heading"><p className="eyebrow">YOUR RECORDS</p><h1>分析</h1><p className="muted">食事と体重を、記録から振り返る。</p></div>
+    <div className="page-heading"><p className="eyebrow">YOUR RECORDS</p><h1>分析</h1><p className="muted">食事と身体測定を、記録から振り返る。</p></div>
     <div className="analysis-periods" role="group" aria-label="分析期間">{([7, 30, 90, 'all'] as const).map(value => <button key={value} aria-pressed={period === value} onClick={() => setPeriod(value)}>{value === 'all' ? '全期間' : `${value}日`}</button>)}</div>
     <p className="analysis-note">{shortDate(range.start)} — {shortDate(range.end)}{period === 'all' && '（保存データの最初〜最後）'}</p>
     {!data ? <p role="status">記録を読み込み中…</p> : data.error ? <p role="alert">記録を読み込めませんでした。画面を開き直してください。</p> : <>
-      {!meals.recordedDays && !weight.records.length && <p className="analysis-empty" role="status">まだ分析できる記録がありません。ホームで食事や体重を記録してください。</p>}
+      {!meals.recordedDays && !(data.weights.some(row => row.date >= range.start && row.date <= range.end)) && <p className="analysis-empty" role="status">まだ分析できる記録がありません。ホームで食事や身体測定を記録してください。</p>}
       <section className="card analysis-block" aria-label="摂取カロリー概要"><h2>摂取カロリー概要</h2>
         <p className="analysis-note">記録日 {meals.recordedDays} / {range.days}日 · 分析対象 {meals.eligibleDays}日</p><p className="analysis-note">現在の分析設定：{policy.enabled ? `${formatNumber(policy.threshold)} kcal以下を除外` : '除外OFF'}</p>{meals.excludedDays > 0 && <p className="analysis-note">{formatNumber(policy.threshold)} kcal以下の{meals.excludedDays}日を平均から除外</p>}{meals.recordedDays > 0 && meals.eligibleDays === 0 && <p className="analysis-note">分析対象日がありません。設定または食事記録をご確認ください。</p>}
         <p>平均摂取カロリー</p><p className="analysis-number">{meals.average ? formatNumber(meals.average.calories) : '—'} <span>kcal</span></p>
@@ -60,7 +61,7 @@ export function Analysis({ settings }: { settings: UserSettings }) {
       ]} /><p className="analysis-note">各記録日を含む過去7暦日の実測値だけで平均します。期間直前の記録も使用し、未記録日や未来の点は補間しません。</p>
         {!!weight.records.length && <details><summary>体重の日別データ</summary><table><caption>kg / 移動平均に使った記録日数</caption><thead><tr><th>日付</th><th>実測</th><th>7日平均</th></tr></thead><tbody>{weight.records.map(day => <tr key={day.date}><th scope="row">{shortDate(day.date)}</th><td>{formatNumber(day.weight, true)}</td><td>{formatNumber(day.average, true)}<small>（{day.count}日）</small></td></tr>)}</tbody></table></details>}
       </section>
-      <section className="card analysis-block" aria-label="最近の傾向"><h2>最近の傾向</h2><p className="analysis-note">選択期間にかかわらず、今日を含む直近7日とその前の7日を比較します。</p>
+      <MeasurementAnalysis entries={data.weights} range={range} /><section className="card analysis-block" aria-label="最近の傾向"><h2>最近の傾向</h2><p className="analysis-note">選択期間にかかわらず、今日を含む直近7日とその前の7日を比較します。</p>
         <div className="analysis-metrics"><div><b>直近7日</b><small>{shortDate(trends.currentRange.start)}〜{shortDate(trends.currentRange.end)}</small><span>記録 {trends.current.recordedDays} / 7日 · 対象 {trends.current.eligibleDays}日</span></div><div><b>前の7日</b><small>{shortDate(trends.previousRange.start)}〜{shortDate(trends.previousRange.end)}</small><span>記録 {trends.previous.recordedDays} / 7日 · 対象 {trends.previous.eligibleDays}日</span></div></div>
         <table><caption>分析対象日の平均（差は直近 − 前）</caption><thead><tr><th>栄養</th><th>直近</th><th>前</th><th>差</th></tr></thead><tbody>{[{ key: 'calories' as const, label: 'kcal' }, ...pfc.map(({ key, label }) => ({ key, label: `${label} g` }))].map(({ key, label }) => <tr key={key}><th scope="row">{label}</th><td>{trends.current.average ? formatNumber(trends.current.average[key], key !== 'calories' && decimals) : '—'}</td><td>{trends.previous.average ? formatNumber(trends.previous.average[key], key !== 'calories' && decimals) : '—'}</td><td>{trends.difference ? signed(trends.difference[key], key !== 'calories' && decimals) : '—'}</td></tr>)}</tbody></table>
         {!trends.difference ? <p className="analysis-note">分析対象日が少ないため傾向判定なし（各期間4日以上が必要です）。</p> : <p className="analysis-note">現在の分析設定による対象日どうしの単純な差です。</p>}

@@ -23,7 +23,7 @@ export function AnalysisChart({ title, range, series, target, unit, zero = false
   return <figure className="analysis-chart">
     <svg viewBox="0 0 344 190" role="img" aria-labelledby={`${id}-title ${id}-desc`}>
       <title id={`${id}-title`}>{title}</title>
-      <desc id={`${id}-desc`}>{range.start}から{range.end}。未記録日は線をつながず、0として表示しません。{target !== undefined ? `現在の目標${target}${unit}を破線で表示。` : '実測は実線・丸印、7日平均は破線・四角印。'}日別の値は下の日別データで確認できます。</desc>
+      <desc id={`${id}-desc`}>{range.start}から{range.end}。未記録日は線をつながず、0として表示しません。{target !== undefined ? `現在の目標${target}${unit}を破線で表示。` : series.some(line => line.dashed) ? '実測は実線・丸印、7日平均は破線・四角印。' : '実測を丸印で表示。'}日別の値は下の日別データで確認できます。</desc>
       {[min, (min + max) / 2, max].map((tick, index) => <g key={index}><line x1={left} x2={right} y1={y(tick)} y2={y(tick)} className="chart-grid" /><text x={left - 7} y={y(tick) + 4} textAnchor="end">{formatNumber(tick, !zero)}</text></g>)}
       {target !== undefined && <line x1={left} x2={right} y1={y(target)} y2={y(target)} className="chart-target" />}
       {series.map(line => {

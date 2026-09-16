@@ -1,3 +1,4 @@
+import { measurementSeries } from './measurements';
 import { localDate, shiftDate } from './date';
 import { emptyTotals, sumNutrients } from './nutrition';
 import type { MealEntry, Nutrients, UserSettings, WeightEntry } from './types';
@@ -58,13 +59,7 @@ export function targetDifference(average: Nutrients | null, settings: UserSettin
     fat: average.fat - settings.fatTarget, carbs: average.carbs - settings.carbsTarget };
 }
 export function dailyWeights(entries: WeightEntry[]): WeightDay[] {
-  // The current DB has a unique date index. Keep this defensive rule for supplied duplicate data.
-  const latest = new Map<string, WeightEntry>();
-  for (const entry of entries) {
-    const old = latest.get(entry.date);
-    if (!old || entry.createdAt > old.createdAt || (entry.createdAt === old.createdAt && entry.id > old.id)) latest.set(entry.date, entry);
-  }
-  return [...latest.values()].sort((a, b) => a.date.localeCompare(b.date)).map(({ date, weight }) => ({ date, weight }));
+  return measurementSeries(entries, 'weightKg').map(({ date, value }) => ({ date, weight: value }));
 }
 export function movingWeightAverage(days: WeightDay[]): AverageWeightDay[] {
   // Evaluate at recorded dates only: no zero-filled days or extrapolated future points.

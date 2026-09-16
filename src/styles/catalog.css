@@ -75,3 +75,8 @@
 
 .favorite-categories { display: flex; overflow-x: auto; max-width: 100%; padding-bottom: 6px; }
 .favorite-categories button { flex: 0 0 auto; min-width: 80px; min-height: 44px; }
+
+.health-share textarea, .health-share select { width: 100%; max-width: 100%; min-width: 0; font: inherit; color: var(--text); background: var(--card); padding: 12px; border: 1px solid var(--line); border-radius: 12px; }
+.health-share textarea { overflow-wrap: anywhere; }
+.health-resend { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.health-resend input { width: 20px; height: 20px; }
