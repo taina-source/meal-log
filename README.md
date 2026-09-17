@@ -1,4 +1,18 @@
-# Meal Log — 第4C：残りkcal/PFCから食事候補
+# Meal Log — 第5A：データバックアップ／復元
+
+設定の「バックアップと復元」から、ユーザー固有データを1つのJSONファイルへ完全バックアップし、明示確認後に完全復元できます。ファイルはユーザー自身で保存・管理します。バックエンド・クラウド・外部API・新規dependencyは使用しません。
+
+- **対象**：IndexedDB v3の `meals / weights / settings / recipes / favorites / mealSets`。食事・身体測定・設定・レシピ・お気に入り・セットのID、日時、保存済み栄養値、ChatGPT／外食等のsnapshotとprovenanceをそのまま保持し、再計算しません。MEXT・21チェーン同梱JSON、Service Worker cache、PWA assets、一時UI状態は対象外です。
+- **Health**：未完了の `pendingHealthExport` は保存・復元しません。身体測定の共有完了済み `healthExport` は保持します。Appleヘルスケア側のデータを読み書き・同期する機能ではありません。
+- **形式**：`type: "meal-log-backup"`、`formatVersion: 1`、`dbVersion: 3`、`exportedAt`、`app: { name: "Meal Log" }`、`data`内に上記6collectionの配列。現在はこの形式・DB versionのみ対応。ファイル名はローカル時刻の `meal-log-backup-YYYY-MM-DD-HHmm.json` です。
+- **保存**：対応環境ではWeb Shareのファイル共有を使用し、非対応・失敗時はBlobダウンロードへ切り替えます。共有キャンセル後もダウンロードを選択可能。OS側で保存が完了したことを確認してください。exportは元DBを変更しません。
+- **復元**：50MiBまでのファイルを選択→JSON／envelope／collection／重要な行・snapshotのruntime検証→日時・件数プレビュー→置き換え確認、の順です。必要なら確認画面から現在のデータを先に保存できます。merge・部分復元は行いません。
+- **安全性**：全6テーブルのclearと全行書込みを単一Dexie transactionで行い、途中失敗は全体をrollbackします。validation失敗・DB失敗では現在データを保持します。復元成功後は既存live queryで画面へ反映。未知のoptional JSONフィールドは保持しますが、非有限数値・危険なキー・過度な入れ子などは拒否します。checksum・暗号化／パスワード機能は今回は採用していません。
+- **環境**：export/importはオフラインで処理可能（共有先アプリ等のOS操作を除く）。IndexedDB v3・table/index/migration・静的栄養DB・既存機能仕様は未変更。ファイルには個人の食事・身体測定が含まれるため、保存先・共有先にご注意ください。
+
+CSV／Excel出力、クラウド・自動バックアップは未実装です。バーコードと栄養表示専用取り込みは引き続き保留です。
+
+## 第4C：残りkcal/PFCから食事候補
 
 今日のHomeの控えめな「食事候補を見る」から、現在目標と保存済みの摂取値の差を使って候補を表示します。過去日には入口を表示しません。AI・外部APIは使わず、端末内だけで計算します。候補・scoreをDBへ保存せず、記録や目標が変われば再計算します。
 
