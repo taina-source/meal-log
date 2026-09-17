@@ -27,12 +27,12 @@ async function run() {
   assert.match(await page.getByRole('region', { name: '体重概要', exact: true }).innerText(), /100/);
   await page.getByText('身体測定の日別データ', { exact: true }).click(); await layout();
   await nav('ホーム'); await click('ヘルスケアへ共有');
-  await page.getByText('3日分・3項目を共有します', { exact: true }).waitFor();
-  for (const scope of ['7', '30']) { await page.getByLabel('共有対象期間').selectOption(scope); await page.getByText('3日分・3項目を共有します', { exact: true }).waitFor(); }
-  await page.getByLabel('共有対象期間').selectOption('today'); await page.getByText('1日分・1項目を共有します', { exact: true }).waitFor();
-  await page.getByLabel('共有対象期間').selectOption('custom'); await page.getByLabel('開始日').waitFor(); await page.getByText('1日分・1項目を共有します', { exact: true }).waitFor();
+  await page.getByText('2日分・2項目を共有します', { exact: true }).waitFor();
+  for (const scope of ['7', '30']) { await page.getByLabel('共有対象期間').selectOption(scope); await page.getByText('2日分・2項目を共有します', { exact: true }).waitFor(); }
+  await page.getByLabel('共有対象期間').selectOption('today'); await page.getByText('未共有の身体測定はありません', { exact: true }).waitFor();
+  await page.getByLabel('共有対象期間').selectOption('custom'); await page.getByLabel('開始日').waitFor(); await page.getByText('未共有の身体測定はありません', { exact: true }).waitFor();
   await page.getByLabel('共有対象期間').selectOption('all'); await click('共有内容を確認');
-  let p = (await state()).settings.pendingHealthExport; assert.equal(p.payload.measurements.length, 3); assert.ok(p.payload.measurements.every(m => Object.keys(m).length === 2));
+  let p = (await state()).settings.pendingHealthExport; assert.equal(p.payload.measurements.length, 2); assert.ok(p.payload.measurements.every(m => Object.keys(m).length === 2));
   assert.equal(await page.getByRole('link', { name: 'Meal Log Healthを開く', exact: true }).getAttribute('href'), 'shortcuts://run-shortcut?name=Meal%20Log%20Health');
   await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async () => { throw new Error('denied'); } } }));
   await click('ショートカットで共有'); await page.getByText(/コピーできませんでした。連携用JSON欄/).waitFor();
@@ -45,11 +45,11 @@ async function run() {
   await page.reload(); await click('ヘルスケアへ共有'); await page.getByRole('region', { name: '共有確認待ち' }).waitFor(); assert.equal((await state()).settings.pendingHealthExport.payload.exportId, p.payload.exportId);
   await click('キャンセル'); assert.equal((await state()).settings.pendingHealthExport, undefined); assert.equal((await state()).weights.some(w => w.healthExport), false);
   await click('共有内容を確認'); p = (await state()).settings.pendingHealthExport;
-  // Confirm after modifying today's value; only pending snapshot is marked exported.
-  await close(); await click('記録'); await field('ウエスト').fill('97.9'); await save(); await click('ヘルスケアへ共有');
+  // Confirm after modifying the weight from two days ago; only pending snapshot is marked exported.
+  await close(); await click('前日'); await click('前日'); await click('記録'); await field('体重').fill('99.8'); await save(); await click('ヘルスケアへ共有');
   await click('今回の共有を完了にする'); await page.locator('dialog').getByText('未共有 1日分・1項目', { exact: true }).waitFor();
-  const saved = await state(), waist = saved.weights.find(w => w.waistCm !== undefined); assert.equal(waist.healthExport.waistCm.value, 98.4); assert.equal(waist.waistCm, 97.9);
-  await page.getByText('トラブル対応：再共有', { exact: true }).click(); await page.getByLabel('この期間をすべて再共有').check(); await page.getByText(/再共有モード/).waitFor(); await page.getByText('3日分・3項目を共有します', { exact: true }).waitFor(); await layout();
+  const saved = await state(), weight = saved.weights.find(w => w.weightKg !== undefined); assert.equal(weight.healthExport.weightKg.value, 100); assert.equal(weight.weightKg, 99.8); assert.ok(saved.weights.every(w => w.healthExport?.waistCm === undefined));
+  await page.getByText('トラブル対応：再共有', { exact: true }).click(); await page.getByLabel('この期間をすべて再共有').check(); await page.getByText(/再共有モード/).waitFor(); await page.getByText('2日分・2項目を共有します', { exact: true }).waitFor(); await layout();
   await close(); await nav('分析'); await page.getByText('身体測定の日別データ', { exact: true }).click(); await layout();
   assert.deepEqual(errors, []);
   const report = { result: 'PASS', checks: ['three fields, prefill, same-day edit, body-fat-only, waist-only, independent latest', 'analysis periods and missing values', 'all/today/7/30/custom counts, batch preview', 'clipboard refusal manual fallback; no shortcut or Health write executed', 'pending reload, cancel, confirm snapshot after edit, resend warning', '390×844 and 320×440, no overflow'], errors };
