@@ -61,15 +61,20 @@ export function targetDifference(average: Nutrients | null, settings: UserSettin
 export function dailyWeights(entries: WeightEntry[]): WeightDay[] {
   return measurementSeries(entries, 'weightKg').map(({ date, value }) => ({ date, weight: value }));
 }
-export function movingWeightAverage(days: WeightDay[]): AverageWeightDay[] {
-  // Evaluate at recorded dates only: no zero-filled days or extrapolated future points.
+export function calendarMovingAverage(points: { date: string; value: number }[]) {
+  // Recorded dates only: no zero-filled days or extrapolated future points.
+  const days = points.filter(point => Number.isFinite(point.value)).slice().sort((a, b) => a.date.localeCompare(b.date));
   let left = 0, total = 0;
   return days.map((day, right) => {
-    total += day.weight;
-    while (calendarDay(days[left].date) < calendarDay(day.date) - 6) total -= days[left++].weight;
+    total += day.value;
+    while (calendarDay(days[left].date) < calendarDay(day.date) - 6) total -= days[left++].value;
     const count = right - left + 1;
     return { ...day, average: total / count, count };
   });
+}
+export function movingWeightAverage(days: WeightDay[]): AverageWeightDay[] {
+  return calendarMovingAverage(days.map(day => ({ date: day.date, value: day.weight })))
+    .map(({ date, value, average, count }) => ({ date, weight: value, average, count }));
 }
 export function weightSummary(days: WeightDay[], range: DateRange) {
   const records = movingWeightAverage(days).filter(day => within(day.date, range));
