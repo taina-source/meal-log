@@ -1,3 +1,4 @@
+import { RelationshipCard } from '../components/RelationshipCard';
 import { MaintenanceCard } from '../components/MaintenanceCard';
 import { MeasurementAnalysis } from '../components/MeasurementAnalysis';
 import { useMemo, useState } from 'react';
@@ -62,7 +63,7 @@ export function Analysis({ settings }: { settings: UserSettings }) {
       ]} /><p className="analysis-note">各記録日を含む過去7暦日の実測値だけで平均します。期間直前の記録も使用し、未記録日や未来の点は補間しません。</p>
         {!!weight.records.length && <details><summary>体重の日別データ</summary><table><caption>kg / 移動平均に使った記録日数</caption><thead><tr><th>日付</th><th>実測</th><th>7日平均</th></tr></thead><tbody>{weight.records.map(day => <tr key={day.date}><th scope="row">{shortDate(day.date)}</th><td>{formatNumber(day.weight, true)}</td><td>{formatNumber(day.average, true)}<small>（{day.count}日）</small></td></tr>)}</tbody></table></details>}
       </section>
-      <MeasurementAnalysis entries={data.weights} range={range} /><section className="card analysis-block" aria-label="最近の傾向"><h2>最近の傾向</h2><p className="analysis-note">選択期間にかかわらず、今日を含む直近7日とその前の7日を比較します。</p>
+      <RelationshipCard meals={mealDays} weights={weightDays} range={range} policy={policy} /><MeasurementAnalysis entries={data.weights} range={range} /><section className="card analysis-block" aria-label="最近の傾向"><h2>最近の傾向</h2><p className="analysis-note">選択期間にかかわらず、今日を含む直近7日とその前の7日を比較します。</p>
         <div className="analysis-metrics"><div><b>直近7日</b><small>{shortDate(trends.currentRange.start)}〜{shortDate(trends.currentRange.end)}</small><span>記録 {trends.current.recordedDays} / 7日 · 対象 {trends.current.eligibleDays}日</span></div><div><b>前の7日</b><small>{shortDate(trends.previousRange.start)}〜{shortDate(trends.previousRange.end)}</small><span>記録 {trends.previous.recordedDays} / 7日 · 対象 {trends.previous.eligibleDays}日</span></div></div>
         <table><caption>分析対象日の平均（差は直近 − 前）</caption><thead><tr><th>栄養</th><th>直近</th><th>前</th><th>差</th></tr></thead><tbody>{[{ key: 'calories' as const, label: 'kcal' }, ...pfc.map(({ key, label }) => ({ key, label: `${label} g` }))].map(({ key, label }) => <tr key={key}><th scope="row">{label}</th><td>{trends.current.average ? formatNumber(trends.current.average[key], key !== 'calories' && decimals) : '—'}</td><td>{trends.previous.average ? formatNumber(trends.previous.average[key], key !== 'calories' && decimals) : '—'}</td><td>{trends.difference ? signed(trends.difference[key], key !== 'calories' && decimals) : '—'}</td></tr>)}</tbody></table>
         {!trends.difference ? <p className="analysis-note">分析対象日が少ないため傾向判定なし（各期間4日以上が必要です）。</p> : <p className="analysis-note">現在の分析設定による対象日どうしの単純な差です。</p>}
