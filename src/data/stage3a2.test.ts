@@ -22,19 +22,40 @@ const legacyRaw = import.meta.glob<string>('../../public/data/restaurants/{mcdon
 beforeEach(async () => { await Promise.all(db.tables.map(t => t.clear())); });
 describe('第3A-2 静的データ品質', () => {
   it.each(newDatasets.map((d,i) => [d.metadata.restaurantId, d, [150,340,440,180,970,2900,360][i]] as const))('%s JSON・最低件数・provenance・unknown', (_,d,min) => {
-    expect(d.items.length).toBeGreaterThanOrEqual(min);
-    expect(d.items).toHaveLength(d.metadata.variantCount);
-    expect(new Set(d.items.map(i=>i.id)).size).toBe(d.items.length);
-    expect(new Set(d.items.map(i=>`${i.productGroupId}:${i.variantName.normalize('NFKC')}`)).size).toBe(d.items.length);
+    const errors: string[] = [];
+    const restaurant = d.metadata.restaurantId;
+    const restaurantIds = new Set(restaurants.map(r => r.id));
+    const sourceTypes = new Set(['official','official_old','secondary','estimate','unknown']);
+    const ids = new Set<string>(), variants = new Set<string>();
+    if (d.items.length < min) errors.push(`${restaurant}: minimum count ${min}, actual ${d.items.length}`);
+    if (d.items.length !== d.metadata.variantCount) errors.push(`${restaurant}: metadata.variantCount mismatch`);
     for(const item of d.items) {
-      expect(item.name.trim()).not.toBe(''); expect(restaurants.some(r=>r.id===item.restaurantId)).toBe(true);
+      const context = `${restaurant} / ${item.id}`;
+      const variant = `${item.productGroupId}:${item.variantName.normalize('NFKC')}`;
+      if (ids.has(item.id)) errors.push(`${context}: duplicate item ID`);
+      if (variants.has(variant)) errors.push(`${context}: duplicate normalized variant ${variant}`);
+      ids.add(item.id); variants.add(variant);
+      if (item.name.trim() === '') errors.push(`${context}: empty name`);
+      if (!restaurantIds.has(item.restaurantId)) errors.push(`${context}: unknown restaurantId ${item.restaurantId}`);
+      const complete = isComplete(item);
       for(const key of nutrientKeys) {
-        const p=item.nutrientProvenance[key]; expect(p.value).toBe(item[key]); expect(p.retrievedAt).toBe('2026-09-08'); expect(p.sourceUrl).toMatch(/^https:\/\//); expect(p.sourceTitle).not.toBe('');
-        expect(['official','official_old','secondary','estimate','unknown']).toContain(p.sourceType);
-        if(item[key]===null) {expect(p.sourceType).toBe('unknown'); expect(item.rawNutrients[key]).not.toMatch(/^0(?:\.0)*$/); expect(isComplete(item)).toBe(false);}
-        else {expect(Number.isFinite(item[key])).toBe(true);expect(item[key]).toBeGreaterThanOrEqual(0);}
+        const p = item.nutrientProvenance[key], nutrient = `${context} / ${key}`;
+        if (!Object.is(p.value, item[key])) errors.push(`${nutrient}: provenance value mismatch`);
+        if (p.retrievedAt !== '2026-09-08') errors.push(`${nutrient}: retrievedAt mismatch`);
+        if (typeof p.sourceUrl !== 'string' || !/^https:\/\//.test(p.sourceUrl)) errors.push(`${nutrient}: sourceUrl must be https`);
+        if (p.sourceTitle === '') errors.push(`${nutrient}: empty sourceTitle`);
+        if (!sourceTypes.has(p.sourceType)) errors.push(`${nutrient}: invalid sourceType ${p.sourceType}`);
+        if (item[key] === null) {
+          if (p.sourceType !== 'unknown') errors.push(`${nutrient}: null value must have unknown sourceType`);
+          if (typeof item.rawNutrients[key] !== 'string' || /^0(?:\.0)*$/.test(item.rawNutrients[key])) errors.push(`${nutrient}: null rawNutrients must be text and not a false zero`);
+          if (complete !== false) errors.push(`${nutrient}: null value must make isComplete false`);
+        } else {
+          if (!Number.isFinite(item[key])) errors.push(`${nutrient}: value must be finite`);
+          if (!(item[key] >= 0)) errors.push(`${nutrient}: value must be >= 0`);
+        }
       }
     }
+    expect(errors).toEqual([]);
   });
   it('14チェーンのみ実データを同梱し残る7店は維持', () => { expect(newDatasets).toHaveLength(7); expect(restaurants).toHaveLength(21); expect(new Set(newMenus.map(i=>i.restaurantId)).size).toBe(7); expect(newMenus.some(i=>i.restaurantId==='restaurant:ガスト')).toBe(false); });
   it.each([
