@@ -1,4 +1,11 @@
 .analysis-page { display: grid; gap: 16px; }
+.analysis-section { min-width: 0; }
+.analysis-series, .analysis-arrange, .analysis-reorder { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.analysis-series label { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 4px; font-size: 13px; }
+.analysis-series input { width: 20px; height: 20px; }
+.analysis-reorder { padding: 8px 0; }
+.analysis-reorder span { flex: 1 1 100%; font-size: 13px; }
+.analysis-reorder button, .analysis-arrange button { min-height: 44px; }
 .analysis-page .page-heading { margin-bottom: 0; }
 .analysis-periods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--soft); border-radius: 14px; }
 .analysis-periods button { min-height: 44px; padding: 8px 2px; border-radius: 10px; font-weight: 600; }

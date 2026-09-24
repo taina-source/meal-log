@@ -36,6 +36,8 @@ export interface MealEntry extends Nutrients {
   copyTargetDate?: string;
 }
 export interface UserSettings {
+  analysisSeries?: import('./analysisDisplay').SeriesVisibility;
+  analysisSectionOrder?: import('./analysisDisplay').AnalysisSection[];
   calorieTarget: number;
   proteinTarget: number;
   fatTarget: number;
