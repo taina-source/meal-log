@@ -14,8 +14,8 @@ import { formatNumber } from '../../domain/nutrition';
 import { RestaurantDetail } from './RestaurantDetail';
 import { RestaurantCart } from './RestaurantCart';
 
-export function Restaurants({ context, onSaved, initialId }: { context: MealContext; onSaved: (date: string) => void; initialId?: string }) {
-  const { items, error } = useRestaurantMenus();
+export function Restaurants({ context, onSaved, initialId, chainId }: { context: MealContext; onSaved: (date: string) => void; initialId?: string; chainId?: string }) {
+  const { items, error } = useRestaurantMenus(chainId, initialId?.startsWith('restaurant:') ? undefined : initialId);
   const [query, setQuery] = useState(''), [storeQuery, setStoreQuery] = useState(''), [category, setCategory] = useState(''), [menuCategory, setMenuCategory] = useState('');
   const [selected, setSelected] = useState<Restaurant | undefined>(() => restaurants.find(s => s.id === initialId));
   const [detailId, setDetailId] = useState<string | undefined>(initialId?.startsWith('restaurant:') ? undefined : initialId);
@@ -34,7 +34,7 @@ export function Restaurants({ context, onSaved, initialId }: { context: MealCont
     if (quantity >= 99) { setNotice('数量は99までです。'); return; }
     setCart(changeCart(cart, item, quantity + 1)); setNotice(item.name + 'を追加しました');
   };
-  const storeRows = (stores: Restaurant[]) => <div className="catalog-list">{stores.map(store => <button key={store.id} className="catalog-row" onClick={() => openStore(store)}><strong>{store.name}</strong><span>{store.category} · {items.some(item => item.restaurantId === store.id) ? 'メニューを見る' : 'メニューデータが見つかりません'}</span></button>)}{!stores.length && <p className="help">まだありません</p>}</div>;
+  const storeRows = (stores: Restaurant[]) => <div className="catalog-list">{stores.filter(s => !chainId || s.id === chainId).map(store => <button key={store.id} className="catalog-row" onClick={() => openStore(store)}><strong>{store.name}</strong><span>{store.category} · {items.some(item => item.restaurantId === store.id) ? 'メニューを見る' : 'メニューデータが見つかりません'}</span></button>)}{!stores.length && <p className="help">まだありません</p>}</div>;
   const menuRows = (list: RestaurantMenuItem[], grouped = true) => {
     const groups = grouped ? menuGroups(list) : list.map(item => [item]);
     return <div className="catalog-list">{groups.slice(0, limit).map(variants => {

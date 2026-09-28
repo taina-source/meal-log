@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { RestaurantDataset, RestaurantMenuItem } from '../domain/catalog';
+import { restaurantSearchLoader } from './restaurantSearch';
 export const restaurantFiles = ['mcdonalds', 'kfc', 'mos', 'sukiya', 'yoshinoya', 'matsuya', 'marugame', 'subway', 'nakau', 'hanamaru', 'coco', 'ootoya', 'royalhost', 'bikkuri', 'gusto', 'joyfull', 'tenka', 'ohsho', 'sushiro', 'kura', 'hama'] as const;
 let cached: Promise<RestaurantMenuItem[]> | undefined;
 export function loadRestaurantMenus() {
@@ -12,8 +13,8 @@ export function loadRestaurantMenus() {
   })).then(data => data.flat()).catch(error => { cached = undefined; throw error; });
   return cached;
 }
-export function useRestaurantMenus() {
+export function useRestaurantMenus(chainId?: string, itemId?: string) {
   const [items, setItems] = useState<RestaurantMenuItem[]>(), [error, setError] = useState('');
-  useEffect(() => { let active = true; loadRestaurantMenus().then(data => { if (active) setItems(data); }).catch(() => { if (active) setError('外食データを読み込めません。オンラインでアプリの更新を完了してから、もう一度開いてください。'); }); return () => { active = false; }; }, []);
+  useEffect(() => { let active = true; setItems(undefined); setError(''); const load = chainId ? itemId ? restaurantSearchLoader.resolveItem(chainId, itemId).then(result => result.items) : restaurantSearchLoader.loadChain(chainId) : loadRestaurantMenus(); load.then(data => { if (active) setItems(data); }).catch(problem => { if (active) setError(problem instanceof Error ? problem.message : '外食データを読み込めません。オンラインでアプリの更新を完了してください。'); }); return () => { active = false; }; }, [chainId, itemId]);
   return { items, error };
 }
