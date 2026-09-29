@@ -5,7 +5,7 @@ import type { MealContext } from '../../data/catalogRepository';
 import { restaurants } from '../../data/restaurants';
 import { db } from '../../data/db';
 import { useRestaurantMenus } from '../../data/restaurantMenus';
-import { cartTotal, changeCart, isComplete, menuGroups, recentRestaurants, searchMenus, searchRestaurants, sourceLabels } from '../../domain/restaurantMenus';
+import { cartTotal, changeCart, isComplete, menuGroups, recentRestaurants, searchMenus, searchRestaurants, sourceLabels, validQuantity } from '../../domain/restaurantMenus';
 import { ActionButton, BackButton, useSheetTop } from '../../components/CatalogParts';
 import { favoriteId, removeFavorite, saveFavorite } from '../../data/catalogRepository';
 import { FormError } from '../../components/Fields';
@@ -14,7 +14,7 @@ import { formatNumber } from '../../domain/nutrition';
 import { RestaurantDetail } from './RestaurantDetail';
 import { RestaurantCart } from './RestaurantCart';
 
-export function Restaurants({ context, onSaved, initialId, chainId }: { context: MealContext; onSaved: (date: string) => void; initialId?: string; chainId?: string }) {
+export function Restaurants({ context, onSaved, initialId, chainId, initialQuantity }: { context: MealContext; onSaved: (date: string) => void; initialId?: string; chainId?: string; initialQuantity?: number }) {
   const { items, error } = useRestaurantMenus(chainId, initialId?.startsWith('restaurant:') ? undefined : initialId);
   const [query, setQuery] = useState(''), [storeQuery, setStoreQuery] = useState(''), [category, setCategory] = useState(''), [menuCategory, setMenuCategory] = useState('');
   const [selected, setSelected] = useState<Restaurant | undefined>(() => restaurants.find(s => s.id === initialId));
@@ -32,7 +32,8 @@ export function Restaurants({ context, onSaved, initialId, chainId }: { context:
   const add = (item: RestaurantMenuItem) => {
     const quantity = cart.find(line => line.item.id === item.id)?.quantity ?? 0;
     if (quantity >= 99) { setNotice('数量は99までです。'); return; }
-    setCart(changeCart(cart, item, quantity + 1)); setNotice(item.name + 'を追加しました');
+    try { const next = quantity === 0 && item.id === initialId ? validQuantity(initialQuantity ?? 1) : quantity + 1; setCart(changeCart(cart, item, next)); setNotice(item.name + 'を追加しました'); }
+    catch (error) { setNotice(error instanceof Error ? error.message : '数量を確認してください。'); }
   };
   const storeRows = (stores: Restaurant[]) => <div className="catalog-list">{stores.filter(s => !chainId || s.id === chainId).map(store => <button key={store.id} className="catalog-row" onClick={() => openStore(store)}><strong>{store.name}</strong><span>{store.category} · {items.some(item => item.restaurantId === store.id) ? 'メニューを見る' : 'メニューデータが見つかりません'}</span></button>)}{!stores.length && <p className="help">まだありません</p>}</div>;
   const menuRows = (list: RestaurantMenuItem[], grouped = true) => {
@@ -48,6 +49,7 @@ export function Restaurants({ context, onSaved, initialId, chainId }: { context:
   const recentMenuIds = [...new Set(meals.filter(meal => meal.restaurantId === selected?.id).sort((a,b) => b.createdAt.localeCompare(a.createdAt)).map(meal => meal.sourceId))].slice(0,5);
   const storeFavorite = selected ? favorites.find(f => f.id === favoriteId('restaurant', selected.id, 1)) : undefined;
   return <div className="form-stack restaurant-flow">
+    {initialQuantity !== undefined && <p className="help">選択時の量：{initialQuantity}点。追加後の「内容を確認」で商品ごとの個数を変更できます。</p>}
     {review ? <RestaurantCart lines={cart} context={context} onChange={(line, quantity) => setCart(changeCart(cart, line.item, quantity))} onBack={() => setReview(false)} onSaved={onSaved} />
     : detail ? <RestaurantDetail key={detail.id} initial={detail} variants={items.filter(item => item.productGroupId === detail.productGroupId)} onBack={() => setDetailId(undefined)} onAdd={add} />
     : selected ? <><BackButton label="外食一覧へ" onClick={() => { setSelected(undefined); setLimit(35); }} /><div className="store-heading"><h3>{selected.name}</h3><ActionButton className="button secondary small" action={() => storeFavorite ? removeFavorite(storeFavorite.id) : saveFavorite('restaurant', selected.id, 1)}>{storeFavorite ? '★ 店舗を解除' : '☆ 店舗をお気に入り'}</ActionButton></div>

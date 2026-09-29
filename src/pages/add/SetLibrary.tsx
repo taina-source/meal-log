@@ -8,7 +8,8 @@ import { saveSet } from '../../data/catalogRepository';
 import { foodItem, positive, scaleNutrients, setTotal } from '../../domain/foods';
 import { formatNumber } from '../../domain/nutrition';
 import { ActionButton, BackButton, FavoriteButton, NutrientSummary } from '../../components/CatalogParts';
-import { NumberField } from '../../components/Fields';
+import { NumberField, FormError } from '../../components/Fields';
+import { reuseFactor, scaleSavedPortion } from '../../domain/reusePortions';
 import { FoodPicker } from './FoodPicker';
 import { RecipeLibrary } from './RecipeLibrary';
 export function SetLibrary({ foods, onChoose, initialSet }: { foods: Food[]; onChoose: (set: MealSet) => unknown | Promise<unknown>; initialSet?: MealSet }) {
@@ -16,8 +17,17 @@ export function SetLibrary({ foods, onChoose, initialSet }: { foods: Food[]; onC
   const [selected, setSelected] = useState(initialSet), [editing, setEditing] = useState(false);
   useSheetTop(String(editing) + (selected?.id ?? 'list'));
   if (editing) return <SetEditor foods={foods} original={selected} onCancel={() => setEditing(false)} onDone={set => { setSelected(set); setEditing(false); }} />;
-  if (selected) return <div className="form-stack"><BackButton label="セット一覧へ" onClick={() => setSelected(undefined)} /><h3>{selected.name}</h3><div className="catalog-list">{selected.items.map(item => <div className="catalog-row" key={item.id}><strong>{item.name}</strong><span>{item.unit === 'g' ? `${item.quantity}g` : `レシピ全体の${formatNumber(item.quantity * 100, true)}%`} · {formatNumber(item.nutrients.calories)} kcal</span></div>)}</div><NutrientSummary label="セット合計" value={setTotal(selected.items)} /><p className="help">構成する{selected.items.length}件をまとめて登録します。登録前に下のボタンで確定してください。</p><FavoriteButton kind="set" sourceId={selected.id} quantity={1} /><ActionButton action={() => onChoose(selected)}>このセットをまとめて登録</ActionButton><button className="button secondary" onClick={() => setEditing(true)}>セットを編集</button></div>;
+  if (selected) return <SetConfirmation key={`${selected.id}:${selected.updatedAt}`} set={selected} onBack={() => setSelected(undefined)} onEdit={() => setEditing(true)} onChoose={onChoose} />;
   return <div className="form-stack"><h3>いつものセット</h3><p className="help">食品やレシピを、よく食べる組み合わせで。</p><button className="button primary" onClick={() => { setSelected(undefined); setEditing(true); }}>＋ 新しいセットを作る</button><div className="catalog-list">{sets.map(set => <button key={set.id} className="catalog-row" onClick={() => setSelected(set)}><strong>{set.name}</strong><span>{set.items.length}品 · {formatNumber(set.total.calories)} kcal</span></button>)}</div>{!sets.length && <p className="help">保存したセットはまだありません。</p>}</div>;
+}
+function SetConfirmation({ set, onBack, onEdit, onChoose }: { set: MealSet; onBack: () => void; onEdit: () => void; onChoose: (set: MealSet) => unknown | Promise<unknown> }) {
+  const [quantities, setQuantities] = useState(() => set.items.map(item => String(item.quantity)));
+  let error = '', items = set.items;
+  try {
+    items = set.items.map((item, i) => ({ ...item, quantity: Number(quantities[i]), nutrients: scaleSavedPortion(item.nutrients, reuseFactor(item.quantity, quantities[i])) }));
+    if (items.some(item => Object.values(item.nutrients).some(n => !Number.isFinite(n)))) throw new Error('栄養値が不明の構成は登録できません。元の記録を確認してください。');
+  } catch (problem) { error = problem instanceof Error ? problem.message : '量を確認してください。'; }
+  return <div className="form-stack"><BackButton label="セット一覧へ" onClick={onBack} /><h3>{set.name}</h3><p className="help">今回だけ構成ごとの量を変更できます。元のセット・保存済みsnapshotは変更しません。</p>{set.items.map((item, i) => <section className="form-stack" key={item.id}><strong>{item.name}</strong><p className="help">前回量：{item.quantity}{item.unit === 'g' ? 'g' : '（レシピ全体に対する割合）'}</p><NumberField label={`今回の構成${i + 1}の量`} unit={item.unit === 'g' ? 'g' : '倍'} value={quantities[i]} max={10000} onChange={value => setQuantities(current => current.map((old, j) => i === j ? value : old))} /></section>)}<FormError message={error} />{!error && <NutrientSummary label="セット合計" value={setTotal(items)} />}<FavoriteButton kind="set" sourceId={set.id} quantity={1} /><ActionButton disabled={!!error} action={() => { if (error) throw new Error(error); return onChoose({ ...set, items, total: setTotal(items) }); }}>このセットをまとめて登録</ActionButton><button className="button secondary" onClick={onEdit}>セットを編集</button></div>;
 }
 function SetEditor({ foods, original, onDone, onCancel }: { foods: Food[]; original?: MealSet; onDone: (set: MealSet) => void; onCancel: () => void }) {
   const [name, setName] = useState(original?.name ?? '');
